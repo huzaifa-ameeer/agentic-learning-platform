@@ -6,6 +6,12 @@ dotenv.config();
 
 const app = express();
 
+app.use(express.json())
+
+app.get("/", (req, res)=> {
+    res.send("Agentic Learning API is running")
+})
+
 const port = process.env.PORT || 3001;
 
 const startServer = async () => {
