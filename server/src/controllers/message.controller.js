@@ -68,7 +68,11 @@ export const sendMessage = async (req, res) => {
           slug: agent.slug,
         },
         userMessage: content,
-        agentMessage,
+        agentMessage: {
+          id: agentMessage._id,
+          sender: agentMessage.sender,
+          content: agentMessage.content,
+        },
       },
     });
   } catch (error) {
