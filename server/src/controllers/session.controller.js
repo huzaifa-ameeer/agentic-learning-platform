@@ -1,0 +1,40 @@
+import agentModel from "../models/agent.model.js";
+import learningSessionModel from "../models/learningSession.model.js";
+
+export const createSession = async (req, res) => {
+  try {
+    const { agentId, title } = req.body;
+    if (!agentId) {
+      return res.status(400).json({
+        message: "agentId is required",
+        success: false,
+      });
+    }
+    const agent = await agentModel.findOne({
+      _id: agentId,
+      isActive: true,
+    });
+    if (!agent) {
+      return res.status(404).json({
+        message: "agent not found",
+        success: false,
+      });
+    }
+    const session = await learningSessionModel.create({
+      user: req.userId,
+      agent: agentId,
+      title: title || "New Learning Session",
+    });
+    return res.status(201).json({
+      message: "session created successfully",
+      success: true,
+      session,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "error in create session API",
+      success: false,
+    });
+  }
+};
