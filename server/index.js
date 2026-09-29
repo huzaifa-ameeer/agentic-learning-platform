@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 import connectDb from "./src/config/db.js";
@@ -7,7 +7,6 @@ import agentRoutes from "./src/routes/agent.route.js"
 import sessionRoutes from "./src/routes/session.route.js"
 import messageRoutes from "./src/routes/message.route.js"
 
-dotenv.config();
 
 const app = express();
 

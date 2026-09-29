@@ -1,5 +1,7 @@
+import agentModel from "../models/agent.model.js";
 import learningSessionModel from "../models/learningSession.model.js";
 import messageModel from "../models/message.model.js";
+import { generateAgentResponse } from "../services/ai.service.js";
 
 export const sendMessage = async (req, res) => {
   try {
@@ -26,16 +28,43 @@ export const sendMessage = async (req, res) => {
         success: false,
       });
     }
-    const message = await messageModel.create({
+
+    await messageModel.create({
       session: sessionId,
       sender: "user",
       content,
     });
 
+    const agent = await agentModel.findById(session.agent)
+    if (!agent || !agent.isActive) {
+      return res.status(404).json({
+        message: "agent not found or inactive",
+        success: false,
+      });
+    }
+
+    const messages = await messageModel
+      .find({ session: sessionId })
+      .sort({ createdAt: 1 });
+
+      const aiResponse = await generateAgentResponse({
+      systemPrompt: agent.systemPrompt,
+      messages,
+    });
+
+    const agentMessage = await messageModel.create({
+      session: sessionId,
+      sender: "agent",
+      content: aiResponse,
+    });
+
     return res.status(201).json({
       message: "message sent successfully",
       success: true,
-      data: message,
+      data: {
+        userMessage: content,
+        agentMessage,
+      },
     });
   } catch (error) {
     console.log(error);
