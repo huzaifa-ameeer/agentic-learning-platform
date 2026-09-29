@@ -14,7 +14,7 @@ export const isAuth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.userId = decoded.userId;
-    req.userRole = user.role;
+    req.userRole = decoded.role;
 
     next();
   } catch (error) {
