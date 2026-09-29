@@ -45,3 +45,38 @@ export const sendMessage = async (req, res) => {
     });
   }
 };
+
+export const getSessionMessages = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    const session = await learningSessionModel.findOne({
+      _id: sessionId,
+      user: req.userId,
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        message: "session not found",
+        success: false,
+      });
+    }
+
+    const messages = await messageModel
+      .find({ session: sessionId })
+      .sort({ createdAt: 1 });
+
+    return res.status(200).json({
+      message: "messages fetched successfully",
+      success: true,
+      messages,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      message: "error in get session messages API",
+      success: false,
+    });
+  }
+};
