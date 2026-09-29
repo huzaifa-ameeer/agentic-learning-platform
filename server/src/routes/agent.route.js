@@ -1,5 +1,5 @@
 import express from "express";
-import { createAgent, getAgent, getAgents, updateAgent } from "../controllers/agent.controller.js";
+import { createAgent, deleteAgent, getAgent, getAgents, updateAgent } from "../controllers/agent.controller.js";
 import { isAdmin } from "../middlewares/admin.middlerware.js";
 import { isAuth } from "../middlewares/auth.middleware.js";
 
@@ -9,5 +9,6 @@ router.post("/create", isAuth, isAdmin, createAgent);
 router.get("/get-all", isAuth, getAgents)
 router.get("/get-single/:id", isAuth, getAgent)
 router.put("/update/:id", isAuth, isAdmin, updateAgent)
+router.delete("/delete/:id", isAuth, isAdmin, deleteAgent)
 
 export default router;
