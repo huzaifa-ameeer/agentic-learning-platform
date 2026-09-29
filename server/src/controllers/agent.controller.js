@@ -81,3 +81,51 @@ export const getAgent = async (req, res) => {
     });
   }
 };
+
+export const updateAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, slug, description, systemPrompt, isActive } = req.body;
+
+    const agent = await agentModel.findById(id);
+
+    if (!agent) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+    }
+
+    if (slug && slug !== agent.slug) {
+      const existingAgent = await agentModel.findOne({ slug });
+
+      if (existingAgent) {
+        return res.status(409).json({
+          success: false,
+          message: "Agent with this slug already exists",
+        });
+      }
+    }
+
+    agent.name = name ?? agent.name;
+    agent.slug = slug ?? agent.slug;
+    agent.description = description ?? agent.description;
+    agent.systemPrompt = systemPrompt ?? agent.systemPrompt;
+    agent.isActive = isActive ?? agent.isActive;
+
+    await agent.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Agent updated successfully",
+      agent,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error updating agent",
+    });
+  }
+};
