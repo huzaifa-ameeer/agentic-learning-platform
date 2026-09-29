@@ -35,7 +35,7 @@ export const sendMessage = async (req, res) => {
       content,
     });
 
-    const agent = await agentModel.findById(session.agent)
+    const agent = await agentModel.findById(session.agent);
     if (!agent || !agent.isActive) {
       return res.status(404).json({
         message: "agent not found or inactive",
@@ -47,7 +47,7 @@ export const sendMessage = async (req, res) => {
       .find({ session: sessionId })
       .sort({ createdAt: 1 });
 
-      const aiResponse = await generateAgentResponse({
+    const aiResponse = await generateAgentResponse({
       systemPrompt: agent.systemPrompt,
       messages,
     });
@@ -62,6 +62,11 @@ export const sendMessage = async (req, res) => {
       message: "message sent successfully",
       success: true,
       data: {
+        agent: {
+          id: agent._id,
+          name: agent.name,
+          slug: agent.slug,
+        },
         userMessage: content,
         agentMessage,
       },
