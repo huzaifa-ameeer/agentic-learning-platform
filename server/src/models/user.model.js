@@ -1,0 +1,24 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, "name is required"],
+        trim: true
+    },
+    email: {
+        type: String,
+        required: [true, "email is required"],
+        unique: true,
+        lowercase: true,
+        trime: true
+    },
+    password: {
+        type: String,
+        required: [true, "password is required"]
+    }
+}, {timestamps: true})
+
+const userModel = await mongoose.model("User", userSchema)
+
+export default userModel
