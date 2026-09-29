@@ -38,3 +38,25 @@ export const createSession = async (req, res) => {
     });
   }
 };
+
+export const getMySessions = async (req, res) => {
+  try {
+    const sessions = await learningSessionModel.find({
+      user: req.userId,
+    })
+      .populate("agent", "name slug description")
+      .sort({ updatedAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      sessions,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching sessions",
+    });
+  }
+};
