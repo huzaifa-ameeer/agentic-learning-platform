@@ -34,3 +34,50 @@ export const createAgent = async (req, res) => {
     });
   }
 };
+
+export const getAgents = async (req, res) => {
+  try {
+    const agents = await agentModel.find({ isActive: true }).sort({
+      createdAt: -1,
+    });
+
+    return res.status(200).json({
+      success: true,
+      agents,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching agents",
+    });
+  }
+};
+
+export const getAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const agent = await agentModel.findById(id);
+
+    if (!agent) {
+      return res.status(404).json({
+        success: false,
+        message: "Agent not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      agent,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching agent",
+    });
+  }
+};
