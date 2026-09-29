@@ -48,6 +48,7 @@ export const getMySessions = async (req, res) => {
       .sort({ updatedAt: -1 });
 
     return res.status(200).json({
+      message: "sessions found successfully",
       success: true,
       sessions,
     });
@@ -57,6 +58,37 @@ export const getMySessions = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error fetching sessions",
+    });
+  }
+};
+
+export const getSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await learningSessionModel.findOne({
+      _id: id,
+      user: req.userId,
+    }).populate("agent", "name slug description");
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: "Session not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "session found successfully",
+      success: true,
+      session,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching session",
     });
   }
 };
