@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const steps = [
   {
     id: "01",
@@ -48,7 +50,10 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="w-full border-t-4 border-crt-line px-4 py-12 sm:px-6 sm:py-16">
+    <section
+      id="how-it-works"
+      className="w-full scroll-mt-4 border-t-4 border-crt-line px-4 py-14 sm:px-6 sm:py-20"
+    >
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex flex-col items-center gap-2 text-center sm:mb-10">
           <span className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-crt-blue">
@@ -93,12 +98,12 @@ export function HowItWorks() {
         </ol>
 
         <div className="mt-8 flex justify-center sm:mt-10">
-          <a
+          <Link
             href="/login"
             className="border-2 border-crt-line bg-crt-blue px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
           >
             start cooking
-          </a>
+          </Link>
         </div>
       </div>
     </section>
