@@ -149,22 +149,22 @@ export function Navbar() {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "close menu" : "open menu"}
-          className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[5px] border-2 border-crt-line bg-crt-panel shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:hidden"
+          className="group flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[5px] border-2 border-crt-line bg-crt-panel shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:hidden"
         >
           <span
-            className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
+            className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 group-hover:bg-white ${
               open ? "translate-y-[8px] rotate-45" : ""
-            } ${open ? "bg-crt-panel" : ""}`}
+            }`}
           />
           <span
-            className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
+            className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 group-hover:bg-white ${
               open ? "opacity-0" : ""
             }`}
           />
           <span
-            className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
+            className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 group-hover:bg-white ${
               open ? "-translate-y-[8px] -rotate-45" : ""
-            } ${open ? "bg-crt-panel" : ""}`}
+            }`}
           />
         </button>
       </nav>
