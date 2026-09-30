@@ -37,9 +37,12 @@ export const createAgent = async (req, res) => {
 
 export const getAgents = async (req, res) => {
   try {
-    const agents = await agentModel.find({ isActive: true }).sort({
-      createdAt: -1,
-    });
+    const agents = await agentModel
+      .find({ isActive: true })
+      .select(req.userRole === "admin" ? "" : "-systemPrompt")
+      .sort({
+        createdAt: -1,
+      });
 
     return res.status(200).json({
       success: true,
@@ -59,7 +62,9 @@ export const getAgent = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const agent = await agentModel.findById(id);
+    const agent = await agentModel
+      .findById(id)
+      .select(req.userRole === "admin" ? "" : "-systemPrompt");
 
     if (!agent) {
       return res.status(404).json({
