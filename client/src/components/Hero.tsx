@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HashLink } from "./HashLink";
+import { ProtectedLink } from "./ProtectedLink";
 
 const beats = [
   { tag: "no lectures", text: "just ask it stuff at 2am" },
@@ -34,12 +35,12 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href="/login"
+          <ProtectedLink
+            href="/play-area"
             className="border-2 border-crt-line bg-crt-blue px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
           >
             start learning
-          </Link>
+          </ProtectedLink>
           <HashLink
             href="/#how-it-works"
             className="border-2 border-crt-line bg-crt-panel px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-crt-ink shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-ink hover:text-crt-panel hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"

@@ -65,7 +65,44 @@ export const login = (body: { email: string; password: string }) =>
 export const getMe = () =>
   apiRequest<{ success: boolean; user: User }>("/api/auth/get-me");
 
+export async function isLoggedIn(): Promise<boolean> {
+  try {
+    await getMe();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export const logout = () =>
   apiRequest<{ success: boolean; message: string }>("/api/auth/logout", {
     method: "POST",
   });
+
+export type Agent = {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const getAgents = () =>
+  apiRequest<{ success: boolean; agents: Agent[] }>("/api/agent/get-all");
+
+export type LearningSession = {
+  _id: string;
+  user: string;
+  agent: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const createSession = (agentId: string) =>
+  apiRequest<{ success: boolean; message: string; session: LearningSession }>(
+    "/api/session/create",
+    { method: "POST", body: { agentId } },
+  );

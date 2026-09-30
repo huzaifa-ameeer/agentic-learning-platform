@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ProtectedLink } from "./ProtectedLink";
 
 const steps = [
   {
@@ -98,12 +98,12 @@ export function HowItWorks() {
         </ol>
 
         <div className="mt-8 flex justify-center sm:mt-10">
-          <Link
-            href="/login"
+          <ProtectedLink
+            href="/play-area"
             className="border-2 border-crt-line bg-crt-blue px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
           >
             start cooking
-          </Link>
+          </ProtectedLink>
         </div>
       </div>
     </section>

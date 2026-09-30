@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HashLink } from "./HashLink";
+import { ProtectedLink } from "./ProtectedLink";
 import { getMe, logout, type User } from "@/lib/api";
 import { notifySessionChange, onSessionChange } from "@/lib/session";
 
 const links = [
   { label: "home", href: "/" },
   { label: "how it works", href: "/#how-it-works" },
-];
+  ];
 
+const PLAY_AREA_HREF = "/play-area";
 const LOGIN_HREF = "/login";
 
 const buttonClass =
@@ -19,6 +21,7 @@ const buttonClass =
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [checked, setChecked] = useState(false);
@@ -74,6 +77,12 @@ export function Navbar() {
     setLoggingOut(false);
     setOpen(false);
     notifySessionChange();
+
+    if (pathname.startsWith("/play-area")) {
+      router.replace("/");
+      return;
+    }
+
     router.push("/");
     router.refresh();
   };
@@ -116,6 +125,12 @@ export function Navbar() {
               )}
             </li>
           ))}
+
+          <li>
+            <ProtectedLink href={PLAY_AREA_HREF} className={buttonClass}>
+              play area
+            </ProtectedLink>
+          </li>
         </ul>
 
         <div className="hidden items-center gap-3 sm:flex">
@@ -230,6 +245,16 @@ export function Navbar() {
               )}
             </li>
           ))}
+
+          <li>
+            <ProtectedLink
+              href={PLAY_AREA_HREF}
+              onNavigate={close}
+              className={`${buttonClass} w-full px-4 py-3 text-center`}
+            >
+              play area
+            </ProtectedLink>
+          </li>
         </ul>
       </div>
     </header>
