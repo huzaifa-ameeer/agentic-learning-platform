@@ -2,6 +2,14 @@ import agentModel from "../models/agent.model.js";
 import learningSessionModel from "../models/learningSession.model.js";
 import messageModel from "../models/message.model.js";
 import { generateAgentResponse } from "../services/ai.service.js";
+import {
+  buildCacheKey,
+  getCacheEntry,
+  setCacheEntry,
+  clearCacheEntry,
+} from "../services/cache.service.js";
+
+const MESSAGE_CACHE_TTL_MS = Number(process.env.MESSAGE_CACHE_TTL_MS) || 60 * 1000;
 
 export const sendMessage = async (req, res) => {
   try {
@@ -48,6 +56,8 @@ export const sendMessage = async (req, res) => {
       content,
     });
 
+    clearCacheEntry(buildCacheKey("messages", req.userId, sessionId));
+
     const messages = await messageModel
       .find({ session: sessionId })
       .sort({ createdAt: 1 });
@@ -73,6 +83,8 @@ export const sendMessage = async (req, res) => {
       sender: "agent",
       content: aiResponse,
     });
+
+    clearCacheEntry(buildCacheKey("messages", req.userId, sessionId));
 
     return res.status(201).json({
       success: true,
@@ -113,13 +125,29 @@ export const getSessionMessages = async (req, res) => {
       });
     }
 
+    const cacheKey = buildCacheKey("messages", req.userId, sessionId);
+    const cachedMessages = getCacheEntry(cacheKey);
+
+    if (cachedMessages) {
+      return res.status(200).json({
+        message: "messages fetched successfully",
+        success: true,
+        cached: true,
+        messages: cachedMessages,
+      });
+    }
+
     const messages = await messageModel
       .find({ session: sessionId })
-      .sort({ createdAt: 1 });
+      .sort({ createdAt: 1 })
+      .lean();
+
+    setCacheEntry(cacheKey, messages, MESSAGE_CACHE_TTL_MS);
 
     return res.status(200).json({
       message: "messages fetched successfully",
       success: true,
+      cached: false,
       messages,
     });
   } catch (error) {
