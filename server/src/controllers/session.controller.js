@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import agentModel from "../models/agent.model.js";
 import learningSessionModel from "../models/learningSession.model.js";
 
@@ -46,18 +47,20 @@ export const getMySessions = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+    const filter = { user: req.userId };
+
+    if (req.query.agent && mongoose.isValidObjectId(req.query.agent)) {
+      filter.agent = req.query.agent;
+    }
+
     const sessions = await learningSessionModel
-      .find({
-        user: req.userId,
-      })
+      .find(filter)
       .populate("agent", "name slug description")
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalSessions = await learningSessionModel.countDocuments({
-      user: req.userId,
-    });
+    const totalSessions = await learningSessionModel.countDocuments(filter);
 
     const totalPages = Math.ceil(totalSessions / limit);
 
@@ -195,6 +198,38 @@ export const renameSession = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error renaming session",
+    });
+  }
+};
+
+export const deleteSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = await learningSessionModel.findOne({
+      _id: id,
+      user: req.userId,
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: "Session not found",
+      });
+    }
+
+    await learningSessionModel.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Session deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting session",
     });
   }
 };

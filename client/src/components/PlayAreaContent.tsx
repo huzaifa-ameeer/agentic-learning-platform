@@ -1,12 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  ApiError,
-  createSession,
-  getAgents,
-  type Agent,
-} from "@/lib/api";
+import { ApiError, getAgents, type Agent } from "@/lib/api";
 
 function AgentIcon({ name }: { name: string }) {
   const slug = name.toLowerCase();
@@ -86,8 +82,6 @@ export function PlayAreaContent() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [pending, setPending] = useState("");
-  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -116,29 +110,6 @@ export function PlayAreaContent() {
     };
   }, []);
 
-  const handleStart = async (agent: Agent) => {
-    if (pending) {
-      return;
-    }
-
-    setPending(agent._id);
-    setNotice("");
-    setError("");
-
-    try {
-      const result = await createSession(agent._id);
-      setNotice(
-        `session started with ${agent.name.toLowerCase()} (${result.session._id})`,
-      );
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "could not start session",
-      );
-    } finally {
-      setPending("");
-    }
-  };
-
   return (
     <section className="w-full border-t-4 border-crt-line px-4 py-14 sm:px-6 sm:py-20">
       <div className="mx-auto max-w-5xl">
@@ -157,20 +128,6 @@ export function PlayAreaContent() {
             one, hit start, and let it cook.
           </p>
         </div>
-
-        {notice ? (
-          <div
-            role="status"
-            className="mx-auto mt-8 flex max-w-2xl items-center justify-center gap-2 border-2 border-crt-line bg-crt-green/10 px-4 py-3 text-center"
-          >
-            <span className="font-mono text-xs font-bold text-crt-green">
-              &gt;ok
-            </span>
-            <span className="font-mono text-xs leading-relaxed text-crt-ink">
-              {notice}
-            </span>
-          </div>
-        ) : null}
 
         {loading ? (
           <div className="mt-12 flex flex-col items-center gap-4">
@@ -218,20 +175,18 @@ export function PlayAreaContent() {
                     {agent.description}
                   </p>
 
-                  <button
-                    type="button"
-                    onClick={() => handleStart(agent)}
-                    disabled={Boolean(pending)}
-                    className="mt-5 w-full border-2 border-crt-line bg-crt-panel px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] disabled:cursor-not-allowed disabled:opacity-60"
+                  <Link
+                    href={`/sessions?agent=${agent._id}`}
+                    className="mt-5 w-full border-2 border-crt-line bg-crt-panel px-4 py-2.5 text-center font-mono text-xs font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
                   >
-                    {pending === agent._id ? "starting..." : "start session"}
-                  </button>
+                    chat with me!
+                  </Link>
                 </article>
               ))}
             </div>
 
             <p className="mt-12 text-center font-mono text-xs uppercase tracking-widest text-crt-dim">
-              select one, your choice. start session
+              pick a mentor, then chat. each one keeps its own sessions.
             </p>
 
             {error ? (

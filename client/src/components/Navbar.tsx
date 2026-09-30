@@ -11,7 +11,7 @@ import { notifySessionChange, onSessionChange } from "@/lib/session";
 const links = [
   { label: "home", href: "/" },
   { label: "how it works", href: "/#how-it-works" },
-  ];
+];
 
 const PLAY_AREA_HREF = "/play-area";
 const LOGIN_HREF = "/login";
@@ -78,7 +78,7 @@ export function Navbar() {
     setOpen(false);
     notifySessionChange();
 
-    if (pathname.startsWith("/play-area")) {
+    if (pathname.startsWith("/play-area") || pathname.startsWith("/sessions")) {
       router.replace("/");
       return;
     }
@@ -186,8 +186,8 @@ export function Navbar() {
 
       <div
         id="mobile-menu"
-        className={`overflow-hidden border-t-4 border-crt-line transition-[max-height] duration-300 ease-in-out sm:hidden ${
-          open ? "max-h-64" : "max-h-0 border-t-0"
+        className={`overflow-y-auto overscroll-contain border-t-4 border-crt-line transition-[max-height] duration-300 ease-in-out [scrollbar-width:thin] sm:hidden ${
+          open ? "max-h-[32rem]" : "max-h-0 border-t-0"
         }`}
       >
         <ul className="flex flex-col gap-3 px-4 py-4 sm:px-6">
