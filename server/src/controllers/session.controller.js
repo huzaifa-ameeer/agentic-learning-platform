@@ -41,19 +41,40 @@ export const createSession = async (req, res) => {
 
 export const getMySessions = async (req, res) => {
   try {
-    const sessions = await learningSessionModel.find({
-      user: req.userId,
-    })
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const sessions = await learningSessionModel
+      .find({
+        user: req.userId,
+      })
       .populate("agent", "name slug description")
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalSessions = await learningSessionModel.countDocuments({
+      user: req.userId,
+    });
+
+    const totalPages = Math.ceil(totalSessions / limit);
 
     return res.status(200).json({
-      message: "sessions found successfully",
       success: true,
       sessions,
+      pagination: {
+        currentPage: page,
+        limit,
+        totalSessions,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
-    console.error(error);
+    console.log(error);
 
     return res.status(500).json({
       success: false,
