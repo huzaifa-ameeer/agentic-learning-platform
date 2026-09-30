@@ -1,7 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import connectDb from "./src/config/db.js";
+import corsOptions from "./src/config/cors.js";
 import authRoutes from "./src/routes/auth.route.js"
 import agentRoutes from "./src/routes/agent.route.js"
 import sessionRoutes from "./src/routes/session.route.js"
@@ -12,6 +14,7 @@ const app = express();
 
 app.use(express.json())
 app.use(cookieParser());
+app.use(cors(corsOptions));
 
 app.get("/", (req, res)=> {
     res.send("Agentic Learning API is running")
