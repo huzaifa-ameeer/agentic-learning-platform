@@ -24,11 +24,11 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="w-full border-b-4 border-crt-ink bg-crt-bg">
+    <header className="w-full border-b-4 border-crt-line bg-crt-bg">
       <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <a
           href="/"
-          className="font-mono text-2xl font-bold uppercase tracking-widest text-crt-amber [text-shadow:2px_2px_0_#000] transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:[text-shadow:1px_1px_0_#000] sm:text-3xl"
+          className="font-mono text-2xl font-bold uppercase tracking-widest text-crt-blue transition-transform hover:translate-x-[1px] hover:translate-y-[1px] sm:text-3xl"
         >
           Mentaura
         </a>
@@ -38,7 +38,7 @@ export function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="block border-2 border-crt-ink bg-crt-panel px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-amber hover:text-crt-bg hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:px-4 sm:py-2 sm:text-sm"
+                className="block border-2 border-crt-line bg-crt-panel px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:px-4 sm:py-2 sm:text-sm"
               >
                 {link.label}
               </a>
@@ -52,12 +52,12 @@ export function Navbar() {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "close menu" : "open menu"}
-          className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[5px] border-2 border-crt-ink bg-crt-panel shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-amber hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:hidden"
+          className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-[5px] border-2 border-crt-line bg-crt-panel shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:hidden"
         >
           <span
             className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
               open ? "translate-y-[8px] rotate-45" : ""
-            } ${open ? "bg-crt-bg" : ""}`}
+            } ${open ? "bg-crt-panel" : ""}`}
           />
           <span
             className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
@@ -67,14 +67,14 @@ export function Navbar() {
           <span
             className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
               open ? "-translate-y-[8px] -rotate-45" : ""
-            } ${open ? "bg-crt-bg" : ""}`}
+            } ${open ? "bg-crt-panel" : ""}`}
           />
         </button>
       </nav>
 
       <div
         id="mobile-menu"
-        className={`overflow-hidden border-t-4 border-crt-ink transition-[max-height] duration-300 ease-in-out sm:hidden ${
+        className={`overflow-hidden border-t-4 border-crt-line transition-[max-height] duration-300 ease-in-out sm:hidden ${
           open ? "max-h-64" : "max-h-0 border-t-0"
         }`}
       >
@@ -84,7 +84,7 @@ export function Navbar() {
               <a
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="block border-2 border-crt-ink bg-crt-panel px-4 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-amber hover:text-crt-bg hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
+                className="block border-2 border-crt-line bg-crt-panel px-4 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
               >
                 {link.label}
               </a>
