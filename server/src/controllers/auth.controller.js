@@ -31,7 +31,14 @@ export const register = async (req, res) => {
     return res.status(201).json({
       message: "user registered successfully",
       success: true,
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -52,7 +59,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const user = await userModel.findOne({ email });
+    const user = await userModel.findOne({ email }).select("+password");
     if (!user) {
       return res.status(404).json({
         message: "user not found",
@@ -82,7 +89,14 @@ export const login = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      user
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
     });
   } catch (error) {
     console.log(error);
