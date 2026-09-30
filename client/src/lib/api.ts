@@ -64,3 +64,8 @@ export const login = (body: { email: string; password: string }) =>
 
 export const getMe = () =>
   apiRequest<{ success: boolean; user: User }>("/api/auth/get-me");
+
+export const logout = () =>
+  apiRequest<{ success: boolean; message: string }>("/api/auth/logout", {
+    method: "POST",
+  });

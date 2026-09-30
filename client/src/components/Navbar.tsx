@@ -1,48 +1,82 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HashLink } from "./HashLink";
-import { getMe, type User } from "@/lib/api";
+import { getMe, logout, type User } from "@/lib/api";
+import { notifySessionChange, onSessionChange } from "@/lib/session";
 
 const links = [
   { label: "home", href: "/" },
   { label: "how it works", href: "/#how-it-works" },
-  { label: "login", href: "/login" },
 ];
+
+const LOGIN_HREF = "/login";
 
 const buttonClass =
   "block border-2 border-crt-line bg-crt-panel px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:px-4 sm:py-2 sm:text-sm";
 
 export function Navbar() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [checked, setChecked] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     let active = true;
 
-    getMe()
-      .then((data) => {
-        if (active) {
-          setUser(data.user);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setUser(null);
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setChecked(true);
-        }
-      });
+    const load = () => {
+      getMe()
+        .then((data) => {
+          if (active) {
+            setUser(data.user);
+          }
+        })
+        .catch(() => {
+          if (active) {
+            setUser(null);
+          }
+        })
+        .finally(() => {
+          if (active) {
+            setChecked(true);
+          }
+        });
+    };
+
+    load();
+
+    const unsubscribe = onSessionChange(load);
 
     return () => {
       active = false;
+      unsubscribe();
     };
   }, []);
+
+  const handleLogout = async () => {
+    if (loggingOut) {
+      return;
+    }
+
+    setLoggingOut(true);
+
+    try {
+      await logout();
+    } catch {
+      // even if the request fails, drop local state so the UI stays honest
+    }
+
+    setUser(null);
+    setChecked(true);
+    setLoggingOut(false);
+    setOpen(false);
+    notifySessionChange();
+    router.push("/");
+    router.refresh();
+  };
 
   const onResize = () => {
     if (window.innerWidth >= 640) {
@@ -86,14 +120,24 @@ export function Navbar() {
 
         <div className="hidden items-center gap-3 sm:flex">
           {user ? (
-            <span className="flex items-center gap-2 border-2 border-crt-line bg-crt-green/10 px-3 py-2">
-              <span className="h-2 w-2 rounded-full bg-crt-green" />
-              <span className="max-w-[10rem] truncate font-mono text-xs font-bold uppercase tracking-wider text-crt-ink">
-                {user.name}
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-2 border-2 border-crt-line bg-crt-green/10 px-3 py-2">
+                <span className="h-2 w-2 rounded-full bg-crt-green" />
+                <span className="max-w-[10rem] truncate font-mono text-xs font-bold uppercase tracking-wider text-crt-ink">
+                  {user.name}
+                </span>
               </span>
-            </span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="block border-2 border-crt-line bg-crt-panel px-3 py-2 font-mono text-xs font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loggingOut ? "..." : "logout"}
+              </button>
+            </div>
           ) : checked ? (
-            <Link href="/login" className={buttonClass}>
+            <Link href={LOGIN_HREF} className={buttonClass}>
               login
             </Link>
           ) : null}
@@ -133,18 +177,30 @@ export function Navbar() {
       >
         <ul className="flex flex-col gap-3 px-4 py-4 sm:px-6">
           {user ? (
-            <li>
-              <span className="flex items-center justify-center gap-2 border-2 border-crt-line bg-crt-green/10 px-4 py-3">
-                <span className="h-2 w-2 rounded-full bg-crt-green" />
-                <span className="truncate font-mono text-xs font-bold uppercase tracking-wider text-crt-ink">
-                  {user.name}
+            <>
+              <li>
+                <span className="flex items-center justify-center gap-2 border-2 border-crt-line bg-crt-green/10 px-4 py-3">
+                  <span className="h-2 w-2 rounded-full bg-crt-green" />
+                  <span className="truncate font-mono text-xs font-bold uppercase tracking-wider text-crt-ink">
+                    {user.name}
+                  </span>
                 </span>
-              </span>
-            </li>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className={`${buttonClass} w-full px-4 py-3 text-center disabled:cursor-not-allowed disabled:opacity-60`}
+                >
+                  {loggingOut ? "logging out..." : "logout"}
+                </button>
+              </li>
+            </>
           ) : checked ? (
             <li>
               <Link
-                href="/login"
+                href={LOGIN_HREF}
                 onClick={close}
                 className={`${buttonClass} px-4 py-3 text-center`}
               >

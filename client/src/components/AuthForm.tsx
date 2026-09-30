@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ApiError, login, register } from "@/lib/api";
+import { notifySessionChange } from "@/lib/session";
 
 type Mode = "login" | "signup";
 
@@ -76,12 +77,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
       if (mode === "signup") {
         await register({ name: trimmedName, email: trimmedEmail, password });
         await login({ email: trimmedEmail, password });
+        notifySessionChange();
         router.push("/");
         router.refresh();
         return;
       }
 
       await login({ email: trimmedEmail, password });
+      notifySessionChange();
       router.push("/");
       router.refresh();
     } catch (err) {
@@ -96,11 +99,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
   return (
     <div className="flex w-full flex-col items-center justify-center">
       <div className="flex w-full max-w-md flex-col items-center text-center">
-        <span className="border-2 border-crt-line bg-crt-panel px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-crt-dim">
-          auth.exe
-        </span>
-
-        <h1 className="mt-6 font-mono text-3xl font-bold uppercase tracking-widest text-crt-ink sm:text-4xl">
+        <h1 className="font-mono text-3xl font-bold uppercase tracking-widest text-crt-ink sm:text-4xl">
           {titles[mode]}
         </h1>
 
