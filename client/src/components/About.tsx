@@ -60,12 +60,24 @@ export function About() {
             </p>
 
             <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row lg:items-center">
-              <Link
-                href="/"
+              <a
+                href="#top"
                 className="flex w-full items-center justify-center gap-2.5 border-2 border-crt-line bg-crt-panel px-5 py-3 font-mono text-xs font-bold uppercase tracking-wider text-crt-ink shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] sm:w-auto"
               >
-                back to home
-              </Link>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="square"
+                  className="h-3.5 w-3.5 shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M12 20V5" />
+                  <path d="M5 12l7-7 7 7" />
+                </svg>
+                back to top
+              </a>
 
               {LINKS.map((link) => (
                 <a
