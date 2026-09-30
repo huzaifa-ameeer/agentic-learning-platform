@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { HashLink } from "./HashLink";
 
 const links = [
   { label: "home", href: "/" },
@@ -40,9 +41,15 @@ export function Navbar() {
         <ul className="hidden items-center gap-2 sm:flex sm:gap-3">
           {links.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} className={buttonClass}>
-                {link.label}
-              </Link>
+              {link.href.includes("#") ? (
+                <HashLink href={link.href} className={buttonClass}>
+                  {link.label}
+                </HashLink>
+              ) : (
+                <Link href={link.href} className={buttonClass}>
+                  {link.label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
@@ -82,13 +89,22 @@ export function Navbar() {
         <ul className="flex flex-col gap-3 px-4 py-4 sm:px-6">
           {links.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={`${buttonClass} px-4 py-3 text-center`}
-              >
-                {link.label}
-              </Link>
+              {link.href.includes("#") ? (
+                <HashLink
+                  href={link.href}
+                  className={`${buttonClass} px-4 py-3 text-center`}
+                >
+                  {link.label}
+                </HashLink>
+              ) : (
+                <Link
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={`${buttonClass} px-4 py-3 text-center`}
+                >
+                  {link.label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
