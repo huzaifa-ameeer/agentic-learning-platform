@@ -16,7 +16,7 @@ const messageSchema = new mongoose.Schema({
     required: [true, "content is required"],
     trim: true,
   },
-});
+}, {timestamps: true});
 
 const messageModel = mongoose.model("Message", messageSchema);
 
