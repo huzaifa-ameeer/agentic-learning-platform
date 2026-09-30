@@ -92,6 +92,7 @@ export function Navbar() {
               {link.href.includes("#") ? (
                 <HashLink
                   href={link.href}
+                  onNavigate={() => setOpen(false)}
                   className={`${buttonClass} px-4 py-3 text-center`}
                 >
                   {link.label}
