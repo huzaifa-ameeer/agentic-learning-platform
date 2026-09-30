@@ -6,22 +6,26 @@ import { generateAgentResponse } from "../services/ai.service.js";
 export const sendMessage = async (req, res) => {
   try {
     const { sessionId, content } = req.body;
+
     if (!sessionId || !content) {
       return res.status(400).json({
         message: "sessionId and content are required",
         success: false,
       });
     }
+
     const session = await learningSessionModel.findOne({
       _id: sessionId,
       user: req.userId,
     });
+
     if (!session) {
       return res.status(404).json({
         message: "session not found",
         success: false,
       });
     }
+
     if (session.status === "completed") {
       return res.status(400).json({
         message: "this session is already completed",
@@ -29,13 +33,8 @@ export const sendMessage = async (req, res) => {
       });
     }
 
-    await messageModel.create({
-      session: sessionId,
-      sender: "user",
-      content,
-    });
-
     const agent = await agentModel.findById(session.agent);
+
     if (!agent || !agent.isActive) {
       return res.status(404).json({
         message: "agent not found or inactive",
@@ -43,14 +42,31 @@ export const sendMessage = async (req, res) => {
       });
     }
 
+    const userMessage = await messageModel.create({
+      session: sessionId,
+      sender: "user",
+      content,
+    });
+
     const messages = await messageModel
       .find({ session: sessionId })
       .sort({ createdAt: 1 });
 
-    const aiResponse = await generateAgentResponse({
-      systemPrompt: agent.systemPrompt,
-      messages,
-    });
+    let aiResponse;
+
+    try {
+      aiResponse = await generateAgentResponse({
+        systemPrompt: agent.systemPrompt,
+        messages,
+      });
+    } catch (error) {
+      console.error("AI response failed:", error);
+
+      return res.status(503).json({
+        success: false,
+        message: "AI service is currently unavailable",
+      });
+    }
 
     const agentMessage = await messageModel.create({
       session: sessionId,
@@ -59,27 +75,24 @@ export const sendMessage = async (req, res) => {
     });
 
     return res.status(201).json({
-      message: "message sent successfully",
       success: true,
+      message: "message sent successfully",
       data: {
         agent: {
           id: agent._id,
           name: agent.name,
           slug: agent.slug,
         },
-        userMessage: content,
-        agentMessage: {
-          id: agentMessage._id,
-          sender: agentMessage.sender,
-          content: agentMessage.content,
-        },
+        userMessage,
+        agentMessage,
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error("Send message error:", error);
+
     return res.status(500).json({
-      message: "error in send message API",
       success: false,
+      message: "Error in send message API",
     });
   }
 };
