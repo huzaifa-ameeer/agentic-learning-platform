@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HashLink } from "./HashLink";
+import { getMe, type User } from "@/lib/api";
 
 const links = [
   { label: "home", href: "/" },
@@ -15,18 +16,47 @@ const buttonClass =
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    const onResize = () => {
-      if (window.innerWidth >= 640) {
-        setOpen(false);
-      }
-    };
+    let active = true;
 
+    getMe()
+      .then((data) => {
+        if (active) {
+          setUser(data.user);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setUser(null);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setChecked(true);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const onResize = () => {
+    if (window.innerWidth >= 640) {
+      setOpen(false);
+    }
+  };
+
+  useEffect(() => {
     window.addEventListener("resize", onResize);
 
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  const close = () => setOpen(false);
 
   return (
     <header className="w-full border-b-4 border-crt-line bg-crt-bg">
@@ -54,6 +84,21 @@ export function Navbar() {
           ))}
         </ul>
 
+        <div className="hidden items-center gap-3 sm:flex">
+          {user ? (
+            <span className="flex items-center gap-2 border-2 border-crt-line bg-crt-green/10 px-3 py-2">
+              <span className="h-2 w-2 rounded-full bg-crt-green" />
+              <span className="max-w-[10rem] truncate font-mono text-xs font-bold uppercase tracking-wider text-crt-ink">
+                {user.name}
+              </span>
+            </span>
+          ) : checked ? (
+            <Link href="/login" className={buttonClass}>
+              login
+            </Link>
+          ) : null}
+        </div>
+
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
@@ -65,7 +110,7 @@ export function Navbar() {
           <span
             className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
               open ? "translate-y-[8px] rotate-45" : ""
-            } ${open ? "bg-crt-ink" : ""}`}
+            } ${open ? "bg-crt-panel" : ""}`}
           />
           <span
             className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
@@ -75,7 +120,7 @@ export function Navbar() {
           <span
             className={`block h-[3px] w-5 bg-crt-ink transition-all duration-200 ${
               open ? "-translate-y-[8px] -rotate-45" : ""
-            } ${open ? "bg-crt-ink" : ""}`}
+            } ${open ? "bg-crt-panel" : ""}`}
           />
         </button>
       </nav>
@@ -87,12 +132,33 @@ export function Navbar() {
         }`}
       >
         <ul className="flex flex-col gap-3 px-4 py-4 sm:px-6">
+          {user ? (
+            <li>
+              <span className="flex items-center justify-center gap-2 border-2 border-crt-line bg-crt-green/10 px-4 py-3">
+                <span className="h-2 w-2 rounded-full bg-crt-green" />
+                <span className="truncate font-mono text-xs font-bold uppercase tracking-wider text-crt-ink">
+                  {user.name}
+                </span>
+              </span>
+            </li>
+          ) : checked ? (
+            <li>
+              <Link
+                href="/login"
+                onClick={close}
+                className={`${buttonClass} px-4 py-3 text-center`}
+              >
+                login
+              </Link>
+            </li>
+          ) : null}
+
           {links.map((link) => (
             <li key={link.href}>
               {link.href.includes("#") ? (
                 <HashLink
                   href={link.href}
-                  onNavigate={() => setOpen(false)}
+                  onNavigate={close}
                   className={`${buttonClass} px-4 py-3 text-center`}
                 >
                   {link.label}
@@ -100,7 +166,7 @@ export function Navbar() {
               ) : (
                 <Link
                   href={link.href}
-                  onClick={() => setOpen(false)}
+                  onClick={close}
                   className={`${buttonClass} px-4 py-3 text-center`}
                 >
                   {link.label}

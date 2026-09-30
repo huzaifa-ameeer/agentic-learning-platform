@@ -1,4 +1,5 @@
-const DEFAULT_ORIGINS = "http://localhost:3000,http://localhost:5173";
+const DEFAULT_ORIGINS =
+  "http://localhost:3000,http://localhost:3001,http://localhost:5173";
 
 const allowedOrigins = (process.env.CORS_ORIGINS || DEFAULT_ORIGINS)
   .split(",")
