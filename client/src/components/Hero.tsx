@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const beats = [
   { tag: "no lectures", text: "just ask it stuff at 2am" },
   { tag: "no grinding", text: "it actually gets you" },
@@ -15,10 +17,7 @@ export function Hero() {
   return (
     <main className="flex flex-1 flex-col items-center gap-12 px-4 py-12 sm:px-6 sm:py-8 lg:flex-row lg:gap-16">
       <section className="flex w-full flex-1 flex-col items-center text-center lg:items-start lg:text-left">
-        <span className="border-2 border-crt-green bg-crt-green/10 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-widest text-crt-green">
-          ai mentors · no gatekeeping
-        </span>
-
+        
         <h1 className="mt-6 font-mono text-4xl font-bold uppercase leading-[1.05] tracking-tight text-crt-ink sm:text-5xl lg:text-6xl">
           Stop
           <br />
@@ -34,18 +33,18 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <a
+          <Link
             href="/login"
             className="border-2 border-crt-line bg-crt-blue px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
           >
             start learning
-          </a>
-          <a
-            href="/how-it-works"
+          </Link>
+          <Link
+            href="/#how-it-works"
             className="border-2 border-crt-line bg-crt-panel px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-crt-ink shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-ink hover:text-crt-panel hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
           >
             how it works
-          </a>
+          </Link>
         </div>
 
         <ul className="mt-10 flex flex-col gap-2 sm:flex-row sm:gap-4">
