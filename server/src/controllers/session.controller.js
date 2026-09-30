@@ -134,3 +134,46 @@ export const completeSession = async (req, res) => {
     });
   }
 };
+
+export const renameSession = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Session title is required",
+      });
+    }
+
+    const session = await learningSessionModel.findOne({
+      _id: id,
+      user: req.userId,
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: "Session not found",
+      });
+    }
+
+    session.title = title.trim();
+
+    await session.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Session renamed successfully",
+      session,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error renaming session",
+    });
+  }
+};
