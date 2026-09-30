@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { MouseEvent, ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, type MouseEvent, type ReactNode } from "react";
 
 type Props = {
   href: string;
@@ -11,23 +12,66 @@ type Props = {
 };
 
 export function HashLink({ href, className, onNavigate, children }: Props) {
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    const targetId = href.split("#")[1];
+  const router = useRouter();
+  const pathname = usePathname();
+  const pendingRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const targetId = pendingRef.current;
 
     if (!targetId) {
       return;
     }
 
-    const target = document.getElementById(targetId);
+    pendingRef.current = null;
 
-    if (!target) {
+    const scrollToTarget = () => {
+      const target = document.getElementById(targetId);
+
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      window.requestAnimationFrame(scrollToTarget);
+    };
+
+    scrollToTarget();
+  }, [pathname]);
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
+    ) {
+      return;
+    }
+
+    const targetId = href.split("#")[1];
+
+    if (!targetId) {
+      onNavigate?.();
       return;
     }
 
     event.preventDefault();
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.history.replaceState(null, "", href);
+
     onNavigate?.();
+
+    const target = document.getElementById(targetId);
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.replaceState(null, "", href);
+      return;
+    }
+
+    pendingRef.current = targetId;
+
+    router.push(href);
   };
 
   return (

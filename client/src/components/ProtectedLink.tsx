@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type MouseEvent, type ReactNode } from "react";
+import { useRef, type MouseEvent, type ReactNode } from "react";
 import { isLoggedIn } from "@/lib/api";
 
 type Props = {
@@ -21,7 +21,7 @@ export function ProtectedLink({
   onNavigate,
 }: Props) {
   const router = useRouter();
-  const [checking, setChecking] = useState(false);
+  const busy = useRef(false);
 
   const handleClick = async (event: MouseEvent<HTMLAnchorElement>) => {
     if (
@@ -36,18 +36,26 @@ export function ProtectedLink({
 
     event.preventDefault();
 
-    if (checking) {
+    if (busy.current) {
+      onNavigate?.();
       return;
     }
 
-    setChecking(true);
-
-    const allowed = await isLoggedIn();
-
-    setChecking(false);
+    busy.current = true;
     onNavigate?.();
 
+    let allowed = false;
+
+    try {
+      allowed = await isLoggedIn();
+    } catch {
+      allowed = false;
+    }
+
+    busy.current = false;
+
     router.push(allowed ? href : fallbackHref);
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   };
 
   return (
@@ -55,7 +63,7 @@ export function ProtectedLink({
       href={href}
       className={className}
       onClick={handleClick}
-      aria-busy={checking}
+      scroll={false}
     >
       {children}
     </Link>
