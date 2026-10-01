@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { HashLink } from "./HashLink";
 
 const explore = [
@@ -19,15 +16,6 @@ const socials = [
 ];
 
 export function Footer() {
-  const pathname = usePathname();
-
-  const isChatRoute =
-    /^\/sessions\/[^/]+$/.test(pathname) && pathname !== "/sessions/new";
-
-  if (isChatRoute) {
-    return null;
-  }
-
   return (
     <footer className="mt-auto w-full border-t-4 border-crt-line bg-crt-bg">
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:py-12">

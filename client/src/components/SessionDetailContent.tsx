@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
   type FormEvent,
   type KeyboardEvent,
@@ -57,8 +56,6 @@ export function SessionDetailContent() {
   const [pendingReplyId, setPendingReplyId] = useState("");
   const [sendError, setSendError] = useState("");
 
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-
   const loadedHere = loaded?.id === sessionId ? loaded : null;
   const session = loadedHere?.session ?? null;
   const messages = loadedHere?.messages ?? NO_MESSAGES;
@@ -76,11 +73,10 @@ export function SessionDetailContent() {
   const streamingId = pendingReply && !done ? pendingReplyId : "";
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "auto") => {
-    const node = scrollRef.current;
-
-    if (node) {
-      node.scrollTo({ top: node.scrollHeight, behavior });
-    }
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior,
+    });
   }, []);
 
   useEffect(() => {
@@ -236,8 +232,8 @@ export function SessionDetailContent() {
   const busy = thinking || streamingId !== "";
 
   return (
-    <section className="flex w-full min-h-0 flex-1 flex-col overflow-hidden px-4 py-4 sm:px-6 sm:py-6">
-      <div className="mx-auto flex w-full min-h-0 max-w-3xl flex-1 flex-col gap-3 sm:gap-4">
+    <section className="flex w-full flex-1 flex-col px-4 py-4 sm:px-6 sm:py-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 sm:gap-4">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <Link
             href={agent ? `/sessions?agent=${agent._id}` : "/play-area"}
@@ -261,7 +257,7 @@ export function SessionDetailContent() {
           {session.title}
         </h1>
 
-        <div className="flex min-h-0 flex-1 flex-col border-2 border-crt-line bg-crt-panel shadow-[6px_6px_0_0_#000]">
+        <div className="flex flex-col border-2 border-crt-line bg-crt-panel shadow-[6px_6px_0_0_#000]">
           <div className="flex items-center gap-2 border-b-2 border-crt-line bg-crt-line px-4 py-2.5">
             <span className="h-3 w-3 border-2 border-crt-panel bg-crt-blue" />
             <span className="h-3 w-3 border-2 border-crt-panel bg-crt-green" />
@@ -277,10 +273,7 @@ export function SessionDetailContent() {
             ) : null}
           </div>
 
-          <div
-            ref={scrollRef}
-            className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-4"
-          >
+          <div className="flex min-h-[240px] flex-col gap-3 p-4 sm:min-h-[320px]">
             {messages.length === 0 && !thinking ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-2 py-10 text-center">
                 <p className="font-mono text-xs uppercase tracking-widest text-crt-dim">
@@ -322,7 +315,7 @@ export function SessionDetailContent() {
 
           <form
             onSubmit={handleSubmit}
-            className="flex items-start gap-2 border-t-2 border-crt-line px-4 py-3"
+            className="sticky bottom-0 flex items-start gap-2 border-t-2 border-crt-line bg-crt-panel px-4 py-3"
           >
             <span className="pt-2 font-mono text-xs text-crt-green">&gt;</span>
 
