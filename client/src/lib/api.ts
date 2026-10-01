@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export class ApiError extends Error {
   status: number;
@@ -35,7 +35,14 @@ export async function apiRequest<T>(
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new ApiError(data?.message ?? "something went wrong", response.status);
+    if (data === null) {
+      throw new ApiError(
+        `the server returned a non-json response (${response.status}). is the api url correct? currently ${API_URL}`,
+        response.status,
+      );
+    }
+
+    throw new ApiError(data.message ?? "something went wrong", response.status);
   }
 
   return data as T;
@@ -100,6 +107,7 @@ export type LearningSession = {
   user: string;
   agent: Agent | null;
   title: string;
+  status: "active" | "completed";
   createdAt: string;
   updatedAt: string;
 };
@@ -129,6 +137,31 @@ export const deleteSession = (id: string) =>
     `/api/session/delete/${id}`,
     { method: "DELETE" },
   );
+
+export type Message = {
+  _id: string;
+  session: string;
+  sender: "user" | "agent";
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const getSessionMessages = (sessionId: string) =>
+  apiRequest<{ success: boolean; messages: Message[] }>(
+    `/api/message/${sessionId}`,
+  );
+
+export const sendMessage = (body: { sessionId: string; content: string }) =>
+  apiRequest<{
+    success: boolean;
+    message: string;
+    data: {
+      agent: { id: string; name: string; slug: string };
+      userMessage: Message;
+      agentMessage: Message;
+    };
+  }>("/api/message", { method: "POST", body });
 
 export const getMySessions = (agentId?: string) =>
   apiRequest<{
