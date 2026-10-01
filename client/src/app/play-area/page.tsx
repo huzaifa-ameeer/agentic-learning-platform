@@ -3,7 +3,6 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { PlayAreaContent } from "@/components/PlayAreaContent";
 
 export const metadata: Metadata = {
-  title: "play area | Mentaura",
   description: "Choose an AI mentor and start a session",
 };
 

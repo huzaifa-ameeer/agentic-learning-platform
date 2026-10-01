@@ -4,7 +4,6 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { NewSessionContent } from "@/components/NewSessionContent";
 
 export const metadata: Metadata = {
-  title: "new session | Mentaura",
   description: "Start a new learning session",
 };
 

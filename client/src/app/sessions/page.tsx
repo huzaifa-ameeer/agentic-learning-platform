@@ -4,7 +4,6 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { SessionsContent } from "@/components/SessionsContent";
 
 export const metadata: Metadata = {
-  title: "sessions | Mentaura",
   description: "Sessions for this agent",
 };
 

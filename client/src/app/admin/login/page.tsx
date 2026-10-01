@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 
 export const metadata: Metadata = {
-  title: "admin login | Mentaura",
   description: "Mentaura mentor operations console",
   robots: { index: false, follow: false },
 };

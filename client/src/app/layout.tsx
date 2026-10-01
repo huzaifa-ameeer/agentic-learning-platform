@@ -17,6 +17,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
+  // no page overrides this, so every route keeps the same title
   title: "Mentaura",
   description: "Learn with AI mentors",
 };
