@@ -1,11 +1,6 @@
 import { HashLink } from "./HashLink";
 import { ProtectedLink } from "./ProtectedLink";
 
-const beats = [
-  { tag: "no lectures", text: "just ask it stuff at 2am" },
-  { tag: "no grinding", text: "it actually gets you" },
-  { tag: "no bs", text: "straight answers, fr" },
-];
 
 const lines = [
   { who: "you", text: "explain closures but make it not boring", tone: "user" },
@@ -47,18 +42,6 @@ export function Hero() {
             how it works
           </HashLink>
         </div>
-
-        <ul className="mt-10 flex flex-col gap-2 sm:flex-row sm:gap-4">
-          {beats.map((beat) => (
-            <li
-              key={beat.tag}
-              className="font-mono text-[11px] uppercase tracking-wider text-crt-dim"
-            >
-              <span className="text-crt-green">&gt;</span> {beat.tag}{" "}
-              <span className="text-crt-ink">— {beat.text}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className="w-full flex-1 lg:max-w-md">

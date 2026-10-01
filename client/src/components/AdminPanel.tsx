@@ -14,6 +14,7 @@ import {
   type Agent,
 } from "@/lib/api";
 import { AgentGlyph } from "./AgentGlyph";
+import { notifySessionChange } from "@/lib/session";
 
 type View = "create" | "edit" | "delete";
 
@@ -367,6 +368,7 @@ export function AdminPanel() {
       // drop local state anyway
     }
 
+    notifySessionChange();
     router.push("/admin/login");
     router.refresh();
   };
@@ -502,18 +504,18 @@ export function AdminPanel() {
                     type="button"
                     onClick={() => pickView(item.id)}
                     aria-current={active ? "page" : undefined}
-                    className={`flex w-full flex-col items-start gap-1 border-2 px-3 py-2.5 text-left transition-all duration-100 ${
+                    className={`group flex w-full flex-col items-start gap-1 border-2 px-3 py-2.5 text-left transition-all duration-100 ${
                       active
                         ? "border-crt-blue bg-crt-blue text-white shadow-[3px_3px_0_0_#000]"
                         : "border-crt-line bg-crt-panel text-crt-ink hover:bg-crt-blue hover:text-white"
                     }`}
                   >
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider">
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-100 group-hover:text-white">
                       {item.label}
                     </span>
                     <span
-                      className={`font-mono text-[10px] ${
-                        active ? "text-white/80" : "text-crt-dim"
+                      className={`font-mono text-[10px] transition-colors duration-100 ${
+                        active ? "text-white/80" : "text-crt-dim group-hover:text-white/80"
                       }`}
                     >
                       {item.hint}

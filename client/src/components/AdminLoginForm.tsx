@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, adminLogin, getMe } from "@/lib/api";
+import { notifySessionChange } from "@/lib/session";
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -42,7 +43,11 @@ export function AdminLoginForm() {
 
     try {
       await adminLogin({ email: email.trim(), password });
+
+      // the cookie is shared with the main site, tell the navbar to pick it up
+      notifySessionChange();
       router.push("/admin");
+      router.refresh();
     } catch (err) {
       setError(
         err instanceof ApiError

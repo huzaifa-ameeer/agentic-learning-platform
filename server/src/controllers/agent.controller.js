@@ -26,14 +26,15 @@ const applyAiIcon = async (id, { name, description }) => {
 export const createAgent = async (req, res) => {
   try {
     const { name, slug, description, systemPrompt } = req.body;
-    if (!name || !slug || !description || !systemPrompt) {
+    if (!name || !description || !systemPrompt) {
       return res.status(400).json({
         message: "missing details",
         success: false,
       });
     }
 
-    const cleanSlug = normalizeSlug(slug);
+    // a blank slug is derived from the name rather than rejected
+    const cleanSlug = normalizeSlug(slug || name);
 
     if (!cleanSlug) {
       return res.status(400).json({
@@ -50,7 +51,7 @@ export const createAgent = async (req, res) => {
       });
     }
 
-    const icon = fallbackIcon(`${name} ${cleanSlug} ${description}`);
+    const icon = fallbackIcon();
 
     const agent = await agentModel.create({
       name,
