@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
+  useRef,
   useState,
   type FormEvent,
   type KeyboardEvent,
@@ -37,6 +39,24 @@ const formatDate = (value: string) => {
 
 const now = () => new Date().toISOString();
 
+const BOTTOM_THRESHOLD_PX = 120;
+
+const isNearBottom = () => {
+  const doc = document.documentElement;
+
+  return doc.scrollHeight - doc.scrollTop - doc.clientHeight < BOTTOM_THRESHOLD_PX;
+};
+
+const SCROLL_KEYS = new Set([
+  "ArrowDown",
+  "ArrowUp",
+  "PageDown",
+  "PageUp",
+  "Home",
+  "End",
+  " ",
+]);
+
 type Loaded = {
   id: string;
   session: LearningSession;
@@ -55,6 +75,10 @@ export function SessionDetailContent() {
   const [thinking, setThinking] = useState(false);
   const [pendingReplyId, setPendingReplyId] = useState("");
   const [sendError, setSendError] = useState("");
+  const [showJumpToBottom, setShowJumpToBottom] = useState(false);
+
+  const autoFollowRef = useRef(true);
+  const frameRef = useRef<number | null>(null);
 
   const loadedHere = loaded?.id === sessionId ? loaded : null;
   const session = loadedHere?.session ?? null;
@@ -72,10 +96,33 @@ export function SessionDetailContent() {
 
   const streamingId = pendingReply && !done ? pendingReplyId : "";
 
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "auto") => {
+  const scrollToBottom = useCallback(() => {
+    const doc = document.documentElement;
+
+    window.scrollTo({
+      top: doc.scrollHeight,
+      behavior: "instant" as ScrollBehavior,
+    });
+  }, []);
+
+  const syncFollowState = useCallback(() => {
+    if (isNearBottom()) {
+      autoFollowRef.current = true;
+      setShowJumpToBottom(false);
+      return;
+    }
+
+    autoFollowRef.current = false;
+    setShowJumpToBottom(true);
+  }, []);
+
+  const jumpToBottom = useCallback(() => {
+    autoFollowRef.current = true;
+    setShowJumpToBottom(false);
+
     window.scrollTo({
       top: document.documentElement.scrollHeight,
-      behavior,
+      behavior: "smooth",
     });
   }, []);
 
@@ -114,8 +161,55 @@ export function SessionDetailContent() {
   }, [sessionId]);
 
   useEffect(() => {
-    scrollToBottom();
+    const onScroll = () => {
+      syncFollowState();
+    };
+
+    const onUserIntent = (event: Event) => {
+      if (event instanceof KeyboardEvent && !SCROLL_KEYS.has(event.key)) {
+        return;
+      }
+
+      autoFollowRef.current = false;
+      setShowJumpToBottom(!isNearBottom());
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", onUserIntent, { passive: true });
+    window.addEventListener("touchmove", onUserIntent, { passive: true });
+    window.addEventListener("keydown", onUserIntent);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onUserIntent);
+      window.removeEventListener("touchmove", onUserIntent);
+      window.removeEventListener("keydown", onUserIntent);
+    };
+  }, [syncFollowState]);
+
+  useLayoutEffect(() => {
+    if (frameRef.current !== null) {
+      return;
+    }
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+
+      if (autoFollowRef.current) {
+        scrollToBottom();
+      }
+    });
   }, [messages.length, revealed, thinking, scrollToBottom]);
+
+  useEffect(() => {
+    const frame = frameRef.current;
+
+    return () => {
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -129,6 +223,9 @@ export function SessionDetailContent() {
     setSendError("");
     setDraft("");
     setThinking(true);
+
+    autoFollowRef.current = true;
+    setShowJumpToBottom(false);
 
     const optimisticId = `pending-${Date.now()}`;
     const optimistic: Message = {
@@ -168,7 +265,7 @@ export function SessionDetailContent() {
       setThinking(false);
       setPendingReplyId(result.data.agentMessage._id);
 
-      scrollToBottom("smooth");
+      jumpToBottom();
     } catch (err) {
       setThinking(false);
       setDraft(content);
@@ -232,7 +329,30 @@ export function SessionDetailContent() {
   const busy = thinking || streamingId !== "";
 
   return (
-    <section className="flex w-full flex-1 flex-col px-4 py-4 sm:px-6 sm:py-6">
+    <section className="relative flex w-full flex-1 flex-col px-4 py-4 sm:px-6 sm:py-6">
+      {showJumpToBottom ? (
+        <button
+          type="button"
+          onClick={jumpToBottom}
+          aria-label="scroll to latest message"
+          className="fixed left-1/2 top-16 z-50 flex -translate-x-1/2 items-center gap-1.5 border-2 border-crt-line bg-crt-green px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:shadow-[1px_1px_0_0_#000] active:shadow-none"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={3}
+            strokeLinecap="square"
+            strokeLinejoin="miter"
+            className="h-3 w-3"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 13l7 7 7-7" />
+          </svg>
+          scroll to bottom
+        </button>
+      ) : null}
+
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 sm:gap-4">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <Link
@@ -273,7 +393,7 @@ export function SessionDetailContent() {
             ) : null}
           </div>
 
-          <div className="flex min-h-[240px] flex-col gap-3 p-4 sm:min-h-[320px]">
+          <div className="flex min-h-[240px] scroll-pb-24 flex-col gap-3 p-4 sm:min-h-[320px]">
             {messages.length === 0 && !thinking ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-2 py-10 text-center">
                 <p className="font-mono text-xs uppercase tracking-widest text-crt-dim">
