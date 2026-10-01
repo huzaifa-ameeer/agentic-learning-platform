@@ -458,7 +458,7 @@ export function SessionDetailContent() {
             <button
               type="submit"
               disabled={locked || busy || draft.trim().length === 0}
-              className="shrink-0 border-2 border-crt-line bg-crt-blue px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-white shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] disabled:cursor-not-allowed disabled:bg-crt-line disabled:text-crt-dim disabled:shadow-none disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="shrink-0 border-2 border-crt-line bg-crt-blue px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-wider text-white shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] disabled:cursor-not-allowed disabled:bg-crt-line disabled:text-white disabled:shadow-none disabled:hover:translate-x-0 disabled:hover:translate-y-0"
             >
               send
             </button>

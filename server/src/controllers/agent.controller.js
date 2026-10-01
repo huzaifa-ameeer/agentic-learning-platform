@@ -1,4 +1,4 @@
-import agentModel from "../models/agent.model.js";
+﻿import agentModel from "../models/agent.model.js";
 import learningSessionModel from "../models/learningSession.model.js";
 import { generateAgentIcon } from "../services/ai.service.js";
 import { fallbackIcon } from "../services/icon.service.js";
@@ -79,44 +79,6 @@ export const createAgent = async (req, res) => {
   }
 };
 
-export const regenerateAgentIcon = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const agent = await agentModel.findById(id);
-
-    if (!agent) {
-      return res.status(404).json({
-        success: false,
-        message: "Agent not found",
-      });
-    }
-
-    const icon = await generateAgentIcon({
-      name: agent.name,
-      description: agent.description,
-    });
-
-    agent.icon = icon.glyph;
-    agent.iconAccent = icon.accent;
-    agent.iconSource = icon.source;
-
-    await agent.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Icon regenerated",
-      agent,
-    });
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Error regenerating icon",
-    });
-  }
-};
 
 export const getAgents = async (req, res) => {
   try {

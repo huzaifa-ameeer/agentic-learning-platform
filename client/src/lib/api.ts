@@ -161,12 +161,6 @@ export const deleteAgent = (id: string) =>
     { method: "DELETE" },
   );
 
-export const regenerateAgentIcon = (id: string) =>
-  apiRequest<{ success: boolean; message: string; agent: Agent }>(
-    `/api/agent/regenerate-icon/${id}`,
-    { method: "POST" },
-  );
-
 export type LearningSession = {
   _id: string;
   user: string;

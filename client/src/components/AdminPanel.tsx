@@ -10,7 +10,6 @@ import {
   getAgent,
   getAgents,
   logout,
-  regenerateAgentIcon,
   updateAgent,
   type Agent,
 } from "@/lib/api";
@@ -317,33 +316,6 @@ export function AdminPanel() {
     }
   };
 
-  const handleRegenerateIcon = async () => {
-    if (!editId || saving) {
-      return;
-    }
-
-    setSaving(true);
-    setFormError("");
-    setOkMessage("");
-
-    try {
-      const data = await regenerateAgentIcon(editId);
-
-      setOkMessage(
-        `icon rolled: ${data.agent.icon}${
-          data.agent.iconSource === "ai" ? " (ai)" : " (fallback)"
-        }`,
-      );
-      await load();
-    } catch (err) {
-      setFormError(
-        err instanceof ApiError ? err.message : "could not roll the icon",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const beginDelete = (agent: Agent) => {
     setPendingDelete(agent);
     setConfirmSlug("");
@@ -358,7 +330,10 @@ export function AdminPanel() {
 
     setFormError("");
 
-    if (confirmSlug.trim() !== pendingDelete.slug) {
+    // the label tells you to type /slug, so tolerate the leading slash
+    const typed = confirmSlug.trim().replace(/^\/+/, "").toLowerCase();
+
+    if (typed !== pendingDelete.slug.toLowerCase()) {
       setFormError(`type /${pendingDelete.slug} exactly to confirm`);
       return;
     }
@@ -748,15 +723,6 @@ export function AdminPanel() {
                     >
                       {saving ? "saving..." : "save changes"}
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={handleRegenerateIcon}
-                      disabled={saving}
-                      className={ghostButton}
-                    >
-                      roll icon
-                    </button>
                   </div>
                 </form>
               ) : null}
@@ -870,7 +836,7 @@ export function AdminPanel() {
                           onChange={(event) =>
                             setConfirmSlug(event.target.value)
                           }
-                          placeholder={pendingDelete.slug}
+                          placeholder={`/${pendingDelete.slug}`}
                           className={inputClass}
                         />
                       </label>

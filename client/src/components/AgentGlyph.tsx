@@ -74,53 +74,15 @@ const GLYPHS: Record<AgentIconGlyph, { d: string }[]> = {
   ],
 };
 
-const LEGACY_PATTERNS: [RegExp, AgentIconGlyph][] = [
-  [/code|dev|js|program|web/, "code"],
-  [/terminal|shell|cli/, "terminal"],
-  [/math|calc|algebra|geometry/, "math"],
-  [/sum|sigma/, "sigma"],
-  [/phys|chem|sci|space/, "atom"],
-  [/bio|gen|genet|dna/, "dna"],
-  [/read|book|literat|history/, "book"],
-  [/writ|essay|gramm|edit/, "pen"],
-  [/geo|world|globe|travel/, "globe"],
-  [/design|art|creat|ux/, "palette"],
-  [/music|audio|sound/, "music"],
-  [/secur|hack|cyber|privacy/, "shield"],
-  [/ai|machine|comput|engin/, "cpu"],
-  [/data|analy|stat|financ|business|market/, "chart"],
-  [/startup|launch|growth|career/, "rocket"],
-  [/agent|mentor|tutor|bot|assistant/, "robot"],
-  [/safety|lock|admin/, "lock"],
-  [/key|crypt|secret/, "key"],
-  [/logic|puzzle|reason|philosoph/, "puzzle"],
-  [/idea|creative|invent/, "lightbulb"],
-  [/law|legal|balan/, "scale"],
-];
-
-const pickFromName = (name: string): AgentIconGlyph => {
-  const slug = name.toLowerCase();
-
-  for (const [pattern, glyph] of LEGACY_PATTERNS) {
-    if (pattern.test(slug)) {
-      return glyph;
-    }
-  }
-
-  return "code";
-};
-
-const resolveGlyph = (agent: {
-  name: string;
-  icon?: string;
-}): AgentIconGlyph => {
+// every agent falls back to the <> glyph
+const resolveGlyph = (agent: { icon?: string }): AgentIconGlyph => {
   const stored = agent.icon as AgentIconGlyph | undefined;
 
   if (stored && Object.hasOwn(GLYPHS, stored)) {
     return stored;
   }
 
-  return pickFromName(agent.name);
+  return "code";
 };
 
 export const accentClass = (accent?: string) =>
@@ -143,7 +105,10 @@ export function AgentGlyph({
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className={`${className} ${accentClassName ?? accentClass(agent.iconAccent)}`}
+      className={`${className} ${
+        // the card flips its icon tile to blue on hover, so the glyph follows it
+        accentClassName ?? `${accentClass(agent.iconAccent)} group-hover:text-white`
+      }`}
     >
       {glyph.map((path, index) => (
         <path key={`${path.d}-${index}`} {...STROKE} d={path.d} />
