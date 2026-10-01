@@ -93,6 +93,50 @@ const markdownComponents: Components = {
   ),
 };
 
+const countToken = (text: string, token: string) => {
+  let count = 0;
+  let index = 0;
+
+  while (index < text.length) {
+    if (text[index] === "\\") {
+      index += 2;
+      continue;
+    }
+
+    if (text.startsWith(token, index)) {
+      count += 1;
+      index += token.length;
+      continue;
+    }
+
+    index += 1;
+  }
+
+  return count;
+};
+
+const closeOpenMarkers = (text: string) => {
+  if (!text) {
+    return text;
+  }
+
+  if (countToken(text, "```") % 2 === 1) {
+    return `${text}\n\`\`\``;
+  }
+
+  let result = text;
+
+  if (countToken(result, "`") % 2 === 1) {
+    result += "`";
+  }
+
+  if (countToken(result, "**") % 2 === 1) {
+    result += "**";
+  }
+
+  return result;
+};
+
 export function ChatMessage({
   message,
   agentLabel,
@@ -100,8 +144,9 @@ export function ChatMessage({
   streaming = false,
 }: ChatMessageProps) {
   const fromUser = message.sender === "user";
-  const content = streaming ? (revealed ?? "") : message.content;
-  const caret = streaming && content.length < message.content.length;
+  const raw = streaming ? (revealed ?? "") : message.content;
+  const caret = streaming && raw.length < message.content.length;
+  const source = streaming ? closeOpenMarkers(raw) : raw;
 
   return (
     <div className="flex flex-col gap-1">
@@ -120,22 +165,19 @@ export function ChatMessage({
             : "border-crt-green self-start max-w-full break-words bg-crt-green/10 text-crt-ink sm:max-w-[90%]"
         }`}
       >
-        {streaming ? (
-          <span className="whitespace-pre-wrap break-all sm:break-words">
-            {content}
-            {caret ? (
-              <span className="ml-0.5 inline-block h-3 w-[2px] translate-y-[2px] animate-pulse bg-crt-green" />
-            ) : null}
-          </span>
-        ) : fromUser ? (
-          content
-        ) : (
+        {fromUser ? (
+          raw
+        ) : source ? (
           <div className="min-w-0 max-w-full [&>*+*]:mt-2 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_li]:break-words [&_td]:break-words [&_th]:break-words">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-              {content}
+              {source}
             </ReactMarkdown>
+
+            {caret ? (
+              <span className="-mt-1 ml-0.5 inline-block h-3 w-[2px] translate-y-[2px] animate-pulse bg-crt-green align-middle" />
+            ) : null}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
