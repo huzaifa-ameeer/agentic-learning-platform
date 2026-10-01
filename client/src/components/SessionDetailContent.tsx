@@ -339,7 +339,7 @@ export function SessionDetailContent() {
                     ? "agent is replying..."
                     : "ask anything..."
               }
-              className="max-h-32 min-h-[2.5rem] flex-1 resize-none bg-transparent py-2 font-mono text-xs text-crt-ink outline-none placeholder:text-crt-dim disabled:cursor-not-allowed"
+              className="max-h-32 min-h-[2.5rem] min-w-0 flex-1 resize-none bg-transparent py-2 font-mono text-xs text-crt-ink outline-none placeholder:text-crt-dim disabled:cursor-not-allowed"
             />
 
             <button

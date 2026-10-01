@@ -32,7 +32,7 @@ const markdownComponents: Components = {
       {children}
     </h4>
   ),
-  p: ({ children }) => <p className="leading-relaxed">{children}</p>,
+  p: ({ children }) => <p className="break-words leading-relaxed">{children}</p>,
   strong: ({ children }) => (
     <strong className="bg-crt-blue/15 px-0.5 font-bold text-crt-ink">
       {children}
@@ -73,12 +73,12 @@ const markdownComponents: Components = {
       </code>
     ),
   pre: ({ children }) => (
-    <pre className="mt-2 overflow-x-auto border-2 border-crt-line bg-crt-bg p-3 text-crt-ink">
+    <pre className="mt-2 w-full min-w-0 max-w-full overflow-x-auto border-2 border-crt-line bg-crt-bg p-3 text-crt-ink">
       {children}
     </pre>
   ),
   table: ({ children }) => (
-    <div className="mt-2 overflow-x-auto">
+    <div className="mt-2 w-full min-w-0 max-w-full overflow-x-auto">
       <table className="w-full border-collapse text-xs">{children}</table>
     </div>
   ),
@@ -116,12 +116,12 @@ export function ChatMessage({
       <div
         className={`border-2 px-3 py-2 font-mono text-xs leading-relaxed sm:text-sm ${
           fromUser
-            ? "border-crt-blue self-end whitespace-pre-wrap break-words bg-crt-blue/10 text-crt-ink"
-            : "border-crt-green self-start bg-crt-green/10 text-crt-ink"
+            ? "border-crt-blue self-end max-w-full whitespace-pre-wrap break-all bg-crt-blue/10 text-crt-ink sm:max-w-[80%] sm:break-words"
+            : "border-crt-green self-start max-w-full break-words bg-crt-green/10 text-crt-ink sm:max-w-[90%]"
         }`}
       >
         {streaming ? (
-          <span className="whitespace-pre-wrap break-words">
+          <span className="whitespace-pre-wrap break-all sm:break-words">
             {content}
             {caret ? (
               <span className="ml-0.5 inline-block h-3 w-[2px] translate-y-[2px] animate-pulse bg-crt-green" />
@@ -130,7 +130,7 @@ export function ChatMessage({
         ) : fromUser ? (
           content
         ) : (
-          <div className="[&>*+*]:mt-2 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+          <div className="min-w-0 max-w-full [&>*+*]:mt-2 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_li]:break-words [&_td]:break-words [&_th]:break-words">
             <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
               {content}
             </ReactMarkdown>
