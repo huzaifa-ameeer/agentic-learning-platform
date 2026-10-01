@@ -12,6 +12,9 @@ import messageRoutes from "./src/routes/message.route.js"
 
 const app = express();
 
+// Render terminates TLS and forwards the request, so trust the proxy
+app.set("trust proxy", 1);
+
 app.use(express.json())
 app.use(cookieParser());
 app.use(cors(corsOptions));
