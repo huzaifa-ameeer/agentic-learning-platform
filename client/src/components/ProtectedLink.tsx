@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, type MouseEvent, type ReactNode } from "react";
-import { isLoggedIn } from "@/lib/api";
+import type { MouseEvent, ReactNode } from "react";
+import { useSession } from "./SessionProvider";
 
 type Props = {
   href: string;
@@ -21,9 +21,9 @@ export function ProtectedLink({
   onNavigate,
 }: Props) {
   const router = useRouter();
-  const busy = useRef(false);
+  const { status } = useSession();
 
-  const handleClick = async (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (
       event.metaKey ||
       event.ctrlKey ||
@@ -34,37 +34,22 @@ export function ProtectedLink({
       return;
     }
 
-    event.preventDefault();
+    onNavigate?.();
 
-    if (busy.current) {
-      onNavigate?.();
+    // the session is already resolved in context, so this needs no round trip
+    if (status === "unauthenticated") {
+      event.preventDefault();
+      router.push(fallbackHref);
       return;
     }
 
-    busy.current = true;
-    onNavigate?.();
-
-    let allowed = false;
-
-    try {
-      allowed = await isLoggedIn();
-    } catch {
-      allowed = false;
-    }
-
-    busy.current = false;
-
-    router.push(allowed ? href : fallbackHref);
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    // authenticated: let next drive the prefetched transition.
+    // still loading: navigate anyway and let the destination guard settle it,
+    // which costs no extra request because it reads the same in-flight one.
   };
 
   return (
-    <Link
-      href={href}
-      className={className}
-      onClick={handleClick}
-      scroll={false}
-    >
+    <Link href={href} className={className} onClick={handleClick}>
       {children}
     </Link>
   );

@@ -5,8 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HashLink } from "./HashLink";
 import { ProtectedLink } from "./ProtectedLink";
-import { getMe, logout, type User } from "@/lib/api";
-import { notifySessionChange, onSessionChange } from "@/lib/session";
+import { useSession } from "./SessionProvider";
 
 const links = [
   { label: "home", href: "/" },
@@ -24,41 +23,12 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [checked, setChecked] = useState(false);
+  const { user, status, signOut } = useSession();
   const [loggingOut, setLoggingOut] = useState(false);
 
-  useEffect(() => {
-    let active = true;
+  const checked = status !== "loading";
 
-    const load = () => {
-      getMe()
-        .then((data) => {
-          if (active) {
-            setUser(data.user);
-          }
-        })
-        .catch(() => {
-          if (active) {
-            setUser(null);
-          }
-        })
-        .finally(() => {
-          if (active) {
-            setChecked(true);
-          }
-        });
-    };
-
-    load();
-
-    const unsubscribe = onSessionChange(load);
-
-    return () => {
-      active = false;
-      unsubscribe();
-    };
-  }, []);
+  const close = () => setOpen(false);
 
   const handleLogout = async () => {
     if (loggingOut) {
@@ -66,18 +36,9 @@ export function Navbar() {
     }
 
     setLoggingOut(true);
-
-    try {
-      await logout();
-    } catch {
-      // even if the request fails, drop local state so the UI stays honest
-    }
-
-    setUser(null);
-    setChecked(true);
-    setLoggingOut(false);
     setOpen(false);
-    notifySessionChange();
+    await signOut();
+    setLoggingOut(false);
 
     if (pathname.startsWith("/play-area") || pathname.startsWith("/sessions")) {
       router.replace("/");
@@ -99,8 +60,6 @@ export function Navbar() {
 
     return () => window.removeEventListener("resize", onResize);
   }, []);
-
-  const close = () => setOpen(false);
 
   // the admin gate has its own form, so the navbar login link would be noise there
   const showLoginLink = pathname !== ADMIN_LOGIN_HREF;

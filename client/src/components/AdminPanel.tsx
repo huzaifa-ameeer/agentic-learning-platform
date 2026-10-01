@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ApiError,
@@ -9,12 +8,11 @@ import {
   deleteAgent,
   getAgent,
   getAgents,
-  logout,
   updateAgent,
   type Agent,
 } from "@/lib/api";
 import { AgentGlyph } from "./AgentGlyph";
-import { notifySessionChange } from "@/lib/session";
+import { useSession } from "./SessionProvider";
 
 type View = "create" | "edit" | "delete";
 
@@ -83,7 +81,7 @@ function Banner({
 }
 
 export function AdminPanel() {
-  const router = useRouter();
+  const { signOut } = useSession();
 
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -362,15 +360,7 @@ export function AdminPanel() {
   };
 
   const handleLogout = async () => {
-    try {
-      await logout();
-    } catch {
-      // drop local state anyway
-    }
-
-    notifySessionChange();
-    router.push("/admin/login");
-    router.refresh();
+    await signOut();
   };
 
   const selectedEditAgent = agents.find((agent) => agent._id === editId) ?? null;

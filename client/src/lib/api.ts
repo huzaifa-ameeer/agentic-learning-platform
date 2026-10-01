@@ -78,15 +78,6 @@ export const adminLogin = (body: { email: string; password: string }) =>
 export const getMe = () =>
   apiRequest<{ success: boolean; user: User }>("/api/auth/get-me");
 
-export async function isLoggedIn(): Promise<boolean> {
-  try {
-    await getMe();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export const logout = () =>
   apiRequest<{ success: boolean; message: string }>("/api/auth/logout", {
     method: "POST",

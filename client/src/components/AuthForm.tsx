@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ApiError, login, register } from "@/lib/api";
-import { notifySessionChange } from "@/lib/session";
+import { useSession } from "./SessionProvider";
 
 type Mode = "login" | "signup";
 
@@ -44,6 +44,7 @@ const validate = (mode: Mode, name: string, email: string, password: string) => 
 
 export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
+  const { refresh } = useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -77,14 +78,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
       if (mode === "signup") {
         await register({ name: trimmedName, email: trimmedEmail, password });
         await login({ email: trimmedEmail, password });
-        notifySessionChange();
+        await refresh();
         router.push("/");
         router.refresh();
         return;
       }
 
       await login({ email: trimmedEmail, password });
-      notifySessionChange();
+      await refresh();
       router.push("/");
       router.refresh();
     } catch (err) {

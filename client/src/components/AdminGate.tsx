@@ -1,39 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { getMe } from "@/lib/api";
+import { useEffect, type ReactNode } from "react";
+import { useSession } from "./SessionProvider";
 
 export function AdminGate({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [allowed, setAllowed] = useState(false);
+  const { user, status } = useSession();
+  const allowed = status === "authenticated" && user?.role === "admin";
 
   useEffect(() => {
-    let active = true;
-
-    getMe()
-      .then((data) => {
-        if (!active) {
-          return;
-        }
-
-        if (data.user?.role === "admin") {
-          setAllowed(true);
-          return;
-        }
-
-        router.replace("/admin/login");
-      })
-      .catch(() => {
-        if (active) {
-          router.replace("/admin/login");
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
+    if (status !== "loading" && !allowed) {
+      router.replace("/admin/login");
+    }
+  }, [router, status, allowed]);
 
   if (allowed) {
     return children;

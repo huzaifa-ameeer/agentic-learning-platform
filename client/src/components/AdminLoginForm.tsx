@@ -2,34 +2,25 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
-import { ApiError, adminLogin, getMe } from "@/lib/api";
-import { notifySessionChange } from "@/lib/session";
+import { ApiError, adminLogin } from "@/lib/api";
+import { useSession } from "./SessionProvider";
 
 export function AdminLoginForm() {
   const router = useRouter();
+  const { user, status, refresh } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const isAdmin = status === "authenticated" && user?.role === "admin";
+
   // an already-authenticated admin should never see this form
   useEffect(() => {
-    let active = true;
-
-    getMe()
-      .then((data) => {
-        if (active && data.user?.role === "admin") {
-          router.replace("/admin");
-        }
-      })
-      .catch(() => {
-        // no valid admin session, stay here
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
+    if (isAdmin) {
+      router.replace("/admin");
+    }
+  }, [isAdmin, router]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,9 +34,8 @@ export function AdminLoginForm() {
 
     try {
       await adminLogin({ email: email.trim(), password });
-
-      // the cookie is shared with the main site, tell the navbar to pick it up
-      notifySessionChange();
+      // the cookie is shared with the main site, so pick it up before navigating
+      await refresh();
       router.push("/admin");
       router.refresh();
     } catch (err) {

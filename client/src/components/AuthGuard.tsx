@@ -1,41 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { getMe } from "@/lib/api";
+import { useEffect, type ReactNode } from "react";
+import { useSession } from "./SessionProvider";
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [status, setStatus] = useState<"checking" | "ok" | "denied">(
-    "checking",
-  );
+  const { status } = useSession();
 
   useEffect(() => {
-    let active = true;
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [router, status]);
 
-    getMe()
-      .then(() => {
-        if (active) {
-          setStatus("ok");
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setStatus("denied");
-          router.replace("/login");
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
-
-  if (status === "denied") {
+  if (status === "unauthenticated") {
     return null;
   }
 
-  if (status === "checking") {
+  if (status === "loading") {
     return (
       <section className="flex flex-1 items-center justify-center px-4 py-20 sm:px-6">
         <div className="flex flex-col items-center gap-4 text-center">
