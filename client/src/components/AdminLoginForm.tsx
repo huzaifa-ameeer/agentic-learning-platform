@@ -4,11 +4,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, adminLogin, getMe } from "@/lib/api";
 
-const ADMIN_EMAIL = "huzaifaameer098@gmail.com";
-
 export function AdminLoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -85,6 +83,7 @@ export function AdminLoginForm() {
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            placeholder="enter admin email"
             className="w-full border-2 border-crt-line bg-crt-bg px-3 py-2.5 font-mono text-sm text-crt-ink outline-none transition-colors duration-100 focus:bg-crt-blue/10 focus:border-crt-blue"
           />
         </label>
@@ -96,6 +95,7 @@ export function AdminLoginForm() {
           <input
             type="password"
             name="password"
+            placeholder="enter admin password"
             autoComplete="current-password"
             required
             value={password}
