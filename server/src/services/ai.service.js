@@ -6,6 +6,17 @@ const ai = new GoogleGenAI({
 
 const MODELS = ["gemini-3.5-flash", "gemini-flash-lite-latest"];
 
+const FORMATTING_RULES = [
+  "",
+  "Output formatting rules (follow these):",
+  "- Reply in markdown. never output raw markdown syntax as plain text.",
+  "- Use ## headings to break the answer into scannable sections.",
+  "- Use **bold** for key terms and the single most important takeaway.",
+  "- Use - for bullet lists and 1. for ordered steps.",
+  "- Put all code inside fenced code blocks tagged with a language.",
+  "- Keep paragraphs short (2-3 sentences max). no walls of text.",
+].join("\n");
+
 export const generateAgentResponse = async ({
   systemPrompt,
   messages,
@@ -21,7 +32,7 @@ export const generateAgentResponse = async ({
         model,
         contents,
         config: {
-          systemInstruction: systemPrompt,
+          systemInstruction: `${systemPrompt}\n${FORMATTING_RULES}`,
         },
       });
 

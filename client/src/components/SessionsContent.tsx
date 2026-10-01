@@ -9,6 +9,8 @@ import {
   type LearningSession,
 } from "@/lib/api";
 
+const NO_SESSIONS: LearningSession[] = [];
+
 const formatDate = (value: string) => {
   const date = new Date(value);
 
@@ -23,17 +25,28 @@ const formatDate = (value: string) => {
   });
 };
 
+type Loaded = {
+  agentId: string;
+  sessions: LearningSession[];
+  agentName: string;
+};
+
 export function SessionsContent({ agentId }: { agentId: string }) {
-  const [sessions, setSessions] = useState<LearningSession[]>([]);
-  const [agentName, setAgentName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [loadError, setLoadError] = useState<{
+    agentId: string;
+    message: string;
+  } | null>(null);
+
+  const loadedHere = loaded?.agentId === agentId ? loaded : null;
+  const sessions = loadedHere?.sessions ?? NO_SESSIONS;
+  const agentName = loadedHere?.agentName ?? "";
+  const error =
+    loadError?.agentId === agentId ? loadError.message : "";
+  const loading = !loadedHere && error === "";
 
   useEffect(() => {
     let active = true;
-
-    setLoading(true);
-    setError("");
 
     getMySessions(agentId)
       .then(async (data) => {
@@ -51,22 +64,25 @@ export function SessionsContent({ agentId }: { agentId: string }) {
 
         const kept = data.sessions.filter((session) => session.agent);
 
-        setSessions(kept);
-
         const populated = kept.find((session) => session.agent);
 
-        setAgentName(populated?.agent ? populated.agent.name : "");
+        if (!active) {
+          return;
+        }
+
+        setLoaded({
+          agentId,
+          sessions: kept,
+          agentName: populated?.agent ? populated.agent.name : "",
+        });
       })
       .catch((err) => {
         if (active) {
-          setError(
-            err instanceof ApiError ? err.message : "could not load sessions",
-          );
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
+          setLoadError({
+            agentId,
+            message:
+              err instanceof ApiError ? err.message : "could not load sessions",
+          });
         }
       });
 
@@ -102,7 +118,7 @@ export function SessionsContent({ agentId }: { agentId: string }) {
 
   if (sessions.length === 0) {
     return (
-      <section className="flex flex-1 items-center justify-center px-4 py-20 sm:px-6">
+      <section className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6">
         <div className="flex w-full max-w-md flex-col items-center gap-6 text-center">
           <div className="flex h-16 w-16 items-center justify-center border-4 border-crt-line bg-crt-panel text-crt-dim shadow-[4px_4px_0_0_#000]">
             <svg
@@ -142,8 +158,8 @@ export function SessionsContent({ agentId }: { agentId: string }) {
   }
 
   return (
-    <section className="w-full border-t-4 border-crt-line px-4 py-14 sm:px-6 sm:py-20">
-      <div className="mx-auto max-w-5xl">
+    <section className="flex w-full flex-1 items-center border-t-4 border-crt-line px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mx-auto w-full max-w-5xl">
         <div className="flex flex-col items-center gap-4 text-center">
           <span className="flex items-center gap-2 border-2 border-crt-line bg-crt-panel px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-crt-dim">
             <span className="h-2 w-2 animate-pulse rounded-full bg-crt-green" />
@@ -159,22 +175,24 @@ export function SessionsContent({ agentId }: { agentId: string }) {
             this mentor. pick one to jump back in.
           </p>
 
-          <Link
-            href="/play-area"
-            className="mt-1 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-crt-dim underline decoration-2 underline-offset-2 transition-colors duration-100 hover:text-crt-blue"
-          >
-            <span aria-hidden="true">&lt;</span> back to agents
-          </Link>
+          <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
+            <Link
+              href="/play-area"
+              className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-crt-dim underline decoration-2 underline-offset-2 transition-colors duration-100 hover:text-crt-blue"
+            >
+              <span aria-hidden="true">&lt;</span> back to agents
+            </Link>
 
-          <Link
-            href={`/sessions/new?agent=${agentId}`}
-            className="mt-2 border-2 border-crt-line bg-crt-blue px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
-          >
-            create session
-          </Link>
+            <Link
+              href={`/sessions/new?agent=${agentId}`}
+              className="border-2 border-crt-line bg-crt-blue px-6 py-3 text-center font-mono text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0_0_#000] transition-all duration-100 hover:bg-crt-green hover:shadow-[2px_2px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
+            >
+              create session
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sessions.map((session) => {
             const agent = session.agent;
 

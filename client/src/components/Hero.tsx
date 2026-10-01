@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { HashLink } from "./HashLink";
 import { ProtectedLink } from "./ProtectedLink";
 
