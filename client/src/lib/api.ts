@@ -138,6 +138,12 @@ export const deleteSession = (id: string) =>
     { method: "DELETE" },
   );
 
+export const renameSession = (id: string, title: string) =>
+  apiRequest<{ success: boolean; message: string; session: LearningSession }>(
+    `/api/session/rename/${id}`,
+    { method: "PATCH", body: { title } },
+  );
+
 export type Message = {
   _id: string;
   session: string;

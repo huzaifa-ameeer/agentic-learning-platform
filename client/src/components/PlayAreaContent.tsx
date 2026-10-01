@@ -111,7 +111,7 @@ export function PlayAreaContent() {
   }, []);
 
   return (
-    <section className="w-full border-t-4 border-crt-line px-4 py-14 sm:px-6 sm:py-20">
+    <section className="w-full border-t-4 border-crt-line px-4 py-10 sm:px-6 sm:py-15">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col items-center gap-4 text-center">
           <span className="flex items-center gap-2 border-2 border-crt-line bg-crt-panel px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-crt-dim">

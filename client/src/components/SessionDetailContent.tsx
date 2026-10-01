@@ -236,8 +236,8 @@ export function SessionDetailContent() {
   const busy = thinking || streamingId !== "";
 
   return (
-    <section className="flex w-full flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8">
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
+    <section className="flex w-full min-h-0 flex-1 flex-col overflow-hidden px-4 py-4 sm:px-6 sm:py-6">
+      <div className="mx-auto flex w-full min-h-0 max-w-3xl flex-1 flex-col gap-3 sm:gap-4">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <Link
             href={agent ? `/sessions?agent=${agent._id}` : "/play-area"}
@@ -261,7 +261,7 @@ export function SessionDetailContent() {
           {session.title}
         </h1>
 
-        <div className="flex min-h-[340px] flex-1 flex-col border-2 border-crt-line bg-crt-panel shadow-[6px_6px_0_0_#000]">
+        <div className="flex min-h-0 flex-1 flex-col border-2 border-crt-line bg-crt-panel shadow-[6px_6px_0_0_#000]">
           <div className="flex items-center gap-2 border-b-2 border-crt-line bg-crt-line px-4 py-2.5">
             <span className="h-3 w-3 border-2 border-crt-panel bg-crt-blue" />
             <span className="h-3 w-3 border-2 border-crt-panel bg-crt-green" />
@@ -279,7 +279,7 @@ export function SessionDetailContent() {
 
           <div
             ref={scrollRef}
-            className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4"
+            className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-4"
           >
             {messages.length === 0 && !thinking ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-2 py-10 text-center">

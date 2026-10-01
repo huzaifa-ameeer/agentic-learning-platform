@@ -147,7 +147,7 @@ export const completeSession = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Session completed successfully",
-      session,
+      session: await session.populate("agent", "name slug description"),
     });
   } catch (error) {
     console.log(error);
@@ -187,10 +187,12 @@ export const renameSession = async (req, res) => {
 
     await session.save();
 
+    const populated = await session.populate("agent", "name slug description");
+
     return res.status(200).json({
       success: true,
       message: "Session renamed successfully",
-      session,
+      session: populated,
     });
   } catch (error) {
     console.log(error);
