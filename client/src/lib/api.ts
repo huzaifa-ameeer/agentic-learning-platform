@@ -69,6 +69,12 @@ export const login = (body: { email: string; password: string }) =>
     body,
   });
 
+export const adminLogin = (body: { email: string; password: string }) =>
+  apiRequest<{ success: boolean; message: string; user: User }>(
+    "/api/auth/admin-login",
+    { method: "POST", body },
+  );
+
 export const getMe = () =>
   apiRequest<{ success: boolean; user: User }>("/api/auth/get-me");
 
@@ -86,12 +92,39 @@ export const logout = () =>
     method: "POST",
   });
 
+export type AgentIconGlyph =
+  | "code"
+  | "terminal"
+  | "math"
+  | "sigma"
+  | "atom"
+  | "dna"
+  | "book"
+  | "pen"
+  | "globe"
+  | "palette"
+  | "music"
+  | "shield"
+  | "cpu"
+  | "chart"
+  | "rocket"
+  | "robot"
+  | "lock"
+  | "key"
+  | "puzzle"
+  | "lightbulb"
+  | "scale";
+
 export type Agent = {
   _id: string;
   name: string;
   slug: string;
   description: string;
   isActive: boolean;
+  systemPrompt?: string;
+  icon?: AgentIconGlyph | string;
+  iconAccent?: "blue" | "green" | string;
+  iconSource?: "ai" | "fallback" | string;
   createdAt: string;
   updatedAt: string;
 };
@@ -101,6 +134,38 @@ export const getAgents = () =>
 
 export const getAgent = (id: string) =>
   apiRequest<{ success: boolean; agent: Agent }>(`/api/agent/get-single/${id}`);
+
+export type AgentInput = {
+  name: string;
+  slug: string;
+  description: string;
+  systemPrompt: string;
+  isActive?: boolean;
+};
+
+export const createAgent = (body: AgentInput) =>
+  apiRequest<{ success: boolean; message: string; agent: Agent }>(
+    "/api/agent/create",
+    { method: "POST", body },
+  );
+
+export const updateAgent = (id: string, body: Partial<AgentInput>) =>
+  apiRequest<{ success: boolean; message: string; agent: Agent }>(
+    `/api/agent/update/${id}`,
+    { method: "PUT", body },
+  );
+
+export const deleteAgent = (id: string) =>
+  apiRequest<{ success: boolean; message: string; deletedSessions: number }>(
+    `/api/agent/delete/${id}`,
+    { method: "DELETE" },
+  );
+
+export const regenerateAgentIcon = (id: string) =>
+  apiRequest<{ success: boolean; message: string; agent: Agent }>(
+    `/api/agent/regenerate-icon/${id}`,
+    { method: "POST" },
+  );
 
 export type LearningSession = {
   _id: string;

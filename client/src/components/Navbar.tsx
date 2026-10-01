@@ -15,6 +15,7 @@ const links = [
 
 const PLAY_AREA_HREF = "/play-area";
 const LOGIN_HREF = "/login";
+const ADMIN_LOGIN_HREF = "/admin/login";
 
 const buttonClass =
   "block border-2 border-crt-line bg-crt-panel px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-crt-ink shadow-[3px_3px_0_0_#000] transition-all duration-100 hover:bg-crt-blue hover:text-white hover:shadow-[1px_1px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[3px] active:translate-y-[3px] sm:px-4 sm:py-2 sm:text-sm";
@@ -101,6 +102,9 @@ export function Navbar() {
 
   const close = () => setOpen(false);
 
+  // the admin gate has its own form, so the navbar login link would be noise there
+  const showLoginLink = pathname !== ADMIN_LOGIN_HREF;
+
   return (
     <header className="w-full border-b-4 border-crt-line bg-crt-bg">
       <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
@@ -151,7 +155,7 @@ export function Navbar() {
                 {loggingOut ? "..." : "logout"}
               </button>
             </div>
-          ) : checked ? (
+          ) : checked && showLoginLink ? (
             <Link href={LOGIN_HREF} className={buttonClass}>
               login
             </Link>
@@ -212,7 +216,7 @@ export function Navbar() {
                 </button>
               </li>
             </>
-          ) : checked ? (
+          ) : checked && showLoginLink ? (
             <li>
               <Link
                 href={LOGIN_HREF}

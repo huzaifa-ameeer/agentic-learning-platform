@@ -3,80 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiError, getAgents, type Agent } from "@/lib/api";
-
-function AgentIcon({ name }: { name: string }) {
-  const slug = name.toLowerCase();
-
-  const stroke = {
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 2,
-    strokeLinecap: "square",
-  } as const;
-
-  const common = { viewBox: "0 0 24 24", "aria-hidden": true } as const;
-
-  if (slug.includes("code") || slug.includes("dev") || slug.includes("js")) {
-    return (
-      <svg {...common} className="h-6 w-6">
-        <path {...stroke} d="M9 18l-5-6 5-6" />
-        <path {...stroke} d="M15 6l5 6-5 6" />
-      </svg>
-    );
-  }
-
-  if (slug.includes("math") || slug.includes("calc")) {
-    return (
-      <svg {...common} className="h-6 w-6">
-        <path {...stroke} d="M4 8h16M4 16h16M8 4v16M16 4v16" />
-      </svg>
-    );
-  }
-
-  if (slug.includes("sci") || slug.includes("bio") || slug.includes("chem")) {
-    return (
-      <svg {...common} className="h-6 w-6">
-        <circle {...stroke} cx="12" cy="12" r="3" />
-        <ellipse {...stroke} cx="12" cy="12" rx="9" ry="4" />
-        <ellipse {...stroke} cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)" />
-      </svg>
-    );
-  }
-
-  if (slug.includes("lang") || slug.includes("writ") || slug.includes("eng")) {
-    return (
-      <svg {...common} className="h-6 w-6">
-        <path {...stroke} d="M3 5h10v9H5l-2 3V5z" />
-        <path {...stroke} d="M10 18h8l3 2V9h-4" />
-      </svg>
-    );
-  }
-
-  if (slug.includes("hist") || slug.includes("geo")) {
-    return (
-      <svg {...common} className="h-6 w-6">
-        <circle {...stroke} cx="12" cy="12" r="9" />
-        <path {...stroke} d="M3 12h18M12 3v18" />
-      </svg>
-    );
-  }
-
-  if (slug.includes("design") || slug.includes("art")) {
-    return (
-      <svg {...common} className="h-6 w-6">
-        <path {...stroke} d="M12 3l9 7-9 7-9-7 9-7z" />
-        <path {...stroke} d="M3 17l9 5 9-5" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg {...common} className="h-6 w-6">
-      <rect {...stroke} x="4" y="6" width="16" height="12" />
-      <path {...stroke} d="M12 3v3M12 18v3M4 12h-2M22 12h-2" />
-    </svg>
-  );
-}
+import { AgentGlyph } from "./AgentGlyph";
 
 export function PlayAreaContent() {
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -159,8 +86,8 @@ export function PlayAreaContent() {
                   key={agent._id}
                   className="group flex flex-col items-center border-4 border-crt-line bg-crt-panel p-5 text-center shadow-[6px_6px_0_0_#000] transition-all duration-100 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#000]"
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-crt-line bg-crt-bg text-crt-blue transition-colors duration-100 group-hover:bg-crt-blue group-hover:text-white">
-                    <AgentIcon name={agent.name} />
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-crt-line bg-crt-bg transition-colors duration-100 group-hover:bg-crt-blue group-hover:text-white">
+                    <AgentGlyph agent={agent} />
                   </span>
 
                   <span className="mt-3 max-w-full truncate border-2 border-crt-line bg-crt-bg px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-crt-dim">

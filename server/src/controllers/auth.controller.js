@@ -2,6 +2,33 @@ import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
 
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").toLowerCase();
+
+const isAdminEmail = (email) =>
+  ADMIN_EMAIL.length > 0 && String(email || "").toLowerCase() === ADMIN_EMAIL;
+
+const issueToken = (res, user) => {
+  const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+};
+
 
 export const register = async (req, res) => {
   try {
@@ -26,6 +53,7 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role: isAdminEmail(email) ? "admin" : "user",
     });
 
     return res.status(201).json({
@@ -102,6 +130,59 @@ export const login = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       message: "error in login API",
+      success: false,
+    });
+  }
+};
+
+export const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "missing details",
+        success: false,
+      });
+    }
+
+    if (!isAdminEmail(email)) {
+      return res.status(403).json({
+        message: "this account cannot access the admin panel",
+        success: false,
+      });
+    }
+
+    const user = await userModel.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(404).json({
+        message: "admin account not found, register it first",
+        success: false,
+      });
+    }
+
+    const isPassword = await bcrypt.compare(password, user.password);
+    if (!isPassword) {
+      return res.status(401).json({
+        message: "invalid password",
+        success: false,
+      });
+    }
+
+    if (user.role !== "admin") {
+      user.role = "admin";
+      await user.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin login successful",
+      user: issueToken(res, user),
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "error in admin login API",
       success: false,
     });
   }

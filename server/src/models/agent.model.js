@@ -26,6 +26,19 @@ const agentSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  icon: {
+    type: String,
+    default: "code",
+  },
+  iconAccent: {
+    type: String,
+    default: "blue",
+  },
+  iconSource: {
+    type: String,
+    enum: ["ai", "fallback"],
+    default: "fallback",
+  },
 }, { timestamps: true });
 
 const agentModel = mongoose.model("Agent", agentSchema);
