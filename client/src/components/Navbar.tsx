@@ -23,10 +23,8 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { user, status, signOut } = useSession();
+  const { user, signOut } = useSession();
   const [loggingOut, setLoggingOut] = useState(false);
-
-  const checked = status !== "loading";
 
   const close = () => setOpen(false);
 
@@ -114,7 +112,7 @@ export function Navbar() {
                 {loggingOut ? "..." : "logout"}
               </button>
             </div>
-          ) : checked && showLoginLink ? (
+          ) : showLoginLink ? (
             <Link href={LOGIN_HREF} className={buttonClass}>
               login
             </Link>
@@ -175,7 +173,7 @@ export function Navbar() {
                 </button>
               </li>
             </>
-          ) : checked && showLoginLink ? (
+          ) : showLoginLink ? (
             <li>
               <Link
                 href={LOGIN_HREF}
