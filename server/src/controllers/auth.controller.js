@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
+import { clearCookieOptions, cookieOptions } from "../config/cookie.js"
 
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").toLowerCase();
 
@@ -12,12 +13,7 @@ const issueToken = (res, user) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie("token", token, cookieOptions);
 
   return {
     _id: user._id,
@@ -176,11 +172,7 @@ export const adminLogin = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
+  res.clearCookie("token", clearCookieOptions);
 
   return res.status(200).json({
     success: true,
