@@ -70,7 +70,7 @@ export const sendMessage = async (req, res) => {
         messages,
       });
     } catch (error) {
-      console.error("AI response failed:", error);
+      console.error("AI response failed:", error.message);
 
       return res.status(503).json({
         success: false,
