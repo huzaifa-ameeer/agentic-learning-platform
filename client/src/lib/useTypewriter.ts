@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-const CHARS_PER_TICK = 3;
-const TICK_MS = 24;
-const LINE_PAUSE_MS = 140;
+const CHARS_PER_TICK = 8;
+const TICK_MS = 16;
+const LINE_PAUSE_MS = 50;
 
 const buildRevealSteps = (text: string) => {
   const lineEnds: number[] = [];
