@@ -518,12 +518,29 @@ Implemented in `server/src/services/ai.service.js`.
 ### Model strategy
 
 ```js
-const MODELS = ["gemini-3.5-flash", "gemini-flash-lite-latest"];
+const MODELS = [
+  { name: "gemini-2.5-flash", disableThinking: true },
+  { name: "gemini-3.5-flash", disableThinking: true },
+  { name: "gemini-flash-lite-latest", disableThinking: false },
+];
 ```
 
-Both chat generation and icon generation iterate the list and move to the next
-model only on failure or an empty response. If all fail, the chat path returns
-`503`; the icon path silently falls back.
+`gemini-2.5-flash` is the priority model. Thinking is disabled where the model
+supports it (the flash-lite models reject `thinkingConfig` with a 400), which
+roughly halves first-token latency. Both chat generation and icon generation
+iterate the list and move to the next model only on failure, an empty response,
+or when a deadline expires: `MODEL_DEADLINE_MS = 8000` per attempt inside a
+shared `RESPONSE_DEADLINE_MS = 20000` budget for chat (`AI_RESPONSE_DEADLINE_MS`
+overrides it), and a shared `ICON_DEADLINE_MS = 8000` for icons. If all models
+fail, the chat path returns `503`; the icon path silently falls back.
+
+A failing model is also put on cooldown instead of being retried on every
+message — 60 s for timeouts and `5xx` (`AI_MODEL_COOLDOWN_MS` overrides it), and
+for the exact quota reset window the API reports on `429`. While a model is
+cooling it is skipped; if every model is cooling, the chain still runs in
+recovery order so one bad model can never fail a request outright. Failures log
+as a single line (`AI chat | <model> failed: <reason> | cooling down <time>`),
+never as a stack trace.
 
 ### System prompt composition
 
