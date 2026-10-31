@@ -23,6 +23,15 @@ app.get("/", (req, res)=> {
     res.send("Agentic Learning API is running")
 })
 
+app.get("/api/health", (req, res) => {
+    res.json({
+        success: true,
+        message: "API is healthy",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+    })
+})
+
 app.use("/api/auth", authRoutes)
 app.use("/api/agent", agentRoutes)
 app.use("/api/session", sessionRoutes)
