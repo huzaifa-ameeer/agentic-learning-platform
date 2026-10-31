@@ -8,6 +8,7 @@ import authRoutes from "./src/routes/auth.route.js"
 import agentRoutes from "./src/routes/agent.route.js"
 import sessionRoutes from "./src/routes/session.route.js"
 import messageRoutes from "./src/routes/message.route.js"
+import { startKeepAlive } from "./src/services/keepAlive.service.js"
 
 
 const app = express();
@@ -43,6 +44,7 @@ const startServer = async () => {
   await connectDb();
   app.listen(port, () => {
     console.log(`Server running on port: ${port}`);
+    startKeepAlive();
   });
 };
 
